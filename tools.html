@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform - Deployment & Collaboration Guide</title>
+  <meta name="description" content="Deployment checklists, project budgeting, and delegation rules for Claude Code Pro to build the Care Platform.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="layout-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">CP</div>
+        <div class="brand-name">
+          <h1>Care Platform</h1>
+          <p>Build Roadmap</p>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Overview Dashboard
+          </a>
+        </li>
+        <li class="nav-item" data-phase="0">
+          <a href="phase0.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+            Phase 0: Learning
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="1">
+          <a href="phase1.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            Phase 1: Backend
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="2">
+          <a href="phase2.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Phase 2: Android UI
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="3">
+          <a href="phase3.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3: Testing
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item active">
+          <a href="tools.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Deployment & Tools
+          </a>
+        </li>
+      </nav>
+      
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">0 of 65 tasks completed</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content animate-fade-in">
+      <header class="page-header">
+        <div class="page-title">
+          <h2>Deployment Playbook & Tools Guide</h2>
+          <p>Optimize your collaboration with Claude Pro, view project budgets, and execute final deployment plans.</p>
+        </div>
+        <div class="meta-badges">
+          <div class="badge badge-info">Hosting Guide</div>
+          <div class="badge badge-accent">Production Playbook</div>
+        </div>
+      </header>
+
+      <!-- Collaboration Rules Section -->
+      <section class="dashboard-grid">
+        <!-- Delegate to Claude -->
+        <div class="glass-card col-6" style="border-color: rgba(6, 182, 212, 0.15);">
+          <h3 style="color: var(--color-secondary);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Delegate to Claude
+          </h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.85rem;">
+            These structured tasks are ideal for Claude's code generation strengths.
+          </p>
+
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.9rem; color: var(--text-secondary);">
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-secondary); font-weight: bold;">✔</span>
+              <span><strong style="color: white;">Scaffolding & Boilerplates</strong>: Ask Claude to generate folder architectures, Retrofit client shells, and Mongoose database model boilerplates.</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-secondary); font-weight: bold;">✔</span>
+              <span><strong style="color: white;">Standard Vitals APIs</strong>: Delegate CRUD handlers (health records, vitals entry, profile updates, and settings changes).</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-secondary); font-weight: bold;">✔</span>
+              <span><strong style="color: white;">Chart & Visual rendering</strong>: Prompt Claude for XML/Compose charts setups, list scrolling, and UI styling elements.</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-secondary); font-weight: bold;">✔</span>
+              <span><strong style="color: white;">Problem Solving</strong>: Ask Claude to clarify console error codes, resolve dependency version conflicts, and draft mock datasets.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- What You Must Handle -->
+        <div class="glass-card col-6" style="border-color: rgba(245, 158, 11, 0.15);">
+          <h3 style="color: var(--color-warning);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            What YOU Must Audit
+          </h3>
+          <p style="color: var(--text-secondary); margin-bottom: 1.25rem; font-size: 0.85rem;">
+            Do not copy-paste code for these features blindly. Manually test and double-check all logic.
+          </p>
+
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.9rem; color: var(--text-secondary);">
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-warning); font-weight: bold;">⚠️</span>
+              <span><strong style="color: white;">EmergencySOS pipelines</strong>: Verify SOS location triggers log correctly on database levels before dispatching network sockets.</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-warning); font-weight: bold;">⚠️</span>
+              <span><strong style="color: white;">Role-Based security check</strong>: Inspect backend authorization headers (`roleCheck.js`) to block data leaks between unrelated users.</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-warning); font-weight: bold;">⚠️</span>
+              <span><strong style="color: white;">Token decryption</strong>: Audit how the local DataStore caches token values, and verify tokens wipe clean on logging out.</span>
+            </li>
+            <li style="display: flex; gap: 0.75rem; align-items: flex-start;">
+              <span style="color: var(--color-warning); font-weight: bold;">⚠️</span>
+              <span><strong style="color: white;">Unit Testing & Validation</strong>: Write test suites in Postman to challenge permission boundaries with negative assertions.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Deployment playbook -->
+      <section class="glass-card col-12" style="margin-bottom: 3rem;">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Deployment Playbook
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.85rem;">
+          Follow these structured deployment checklists when preparing the platform for public release.
+        </p>
+
+        <div class="timeline-flow">
+          <!-- Step 1 -->
+          <div class="timeline-step">
+            <div class="timeline-step-header">
+              <span class="timeline-step-title">1. Deploy Express Server</span>
+              <span class="timeline-step-time">Backend API</span>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+              Purchase target domain name (e.g. careplatform.in) and upload backend folders to cloud platforms like DigitalOcean, AWS, or Heroku. Setup SSL certificates (using Let's Encrypt) to enforce secure HTTPS channels.
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="timeline-step">
+            <div class="timeline-step-header">
+              <span class="timeline-step-title">2. Configure Production Database</span>
+              <span class="timeline-step-time">MongoDB Atlas</span>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+              Transition database from sandbox cluster to dedicated Atlas networks. Setup database backup protocols (daily/weekly snapshots) and whitelist API production IP ranges in security tabs.
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="timeline-step">
+            <div class="timeline-step-header">
+              <span class="timeline-step-title">3. Sign Android APK Keystore</span>
+              <span class="timeline-step-time">Android Client</span>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+              Generate release keystores in Android Studio and build the production-ready signed APK bundle. Replace base API URLs inside client configurations to target production routes.
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="timeline-step">
+            <div class="timeline-step-header">
+              <span class="timeline-step-title">4. Deploy to Google Play Console</span>
+              <span class="timeline-step-time">Public Release</span>
+            </div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">
+              Register developer accounts, fill out policy checks, upload app icons/screenshots, attach target privacy policies, and submit signed APK bundles. Review cycles generally complete in 24-48 hours.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Budgets Details -->
+      <section class="glass-card col-12">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-success);"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+          Hosting & Project Budgets Breakdown
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          Estimate of fixed and variable fees incurred when hosting the medical platform infrastructure.
+        </p>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Service Name</th>
+                <th>Monthly Cost</th>
+                <th>Pricing Structure Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: 600; color: white;">Claude Pro Subscription</td>
+                <td>$20 / Month</td>
+                <td>Fixed fee for the AI development assistant during active build phases.</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">Cloud API Server hosting</td>
+                <td>$5 - $15 / Month</td>
+                <td>Basic server pricing on DigitalOcean droplet or AWS EC2 micro node.</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">MongoDB Atlas Cloud Database</td>
+                <td>$0 / Month</td>
+                <td>Free tier handles up to 512MB of record entries (satisfies 10,000+ vitals entries).</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">Firebase Cloud Messaging (FCM)</td>
+                <td>$0 / Month</td>
+                <td>Unlimited push alerts under Firebase's basic tier plans.</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">Google Maps Integration</td>
+                <td>$0 - $5 / Month</td>
+                <td>Free tier credits provide up to 28,000 map renders per month.</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">Domain Registration</td>
+                <td>$10 - $15 / Year</td>
+                <td>One-time annual fee for domain name and DNS controls.</td>
+              </tr>
+              <tr>
+                <td style="font-weight: 600; color: white;">Google Play Console Account</td>
+                <td>$25 (One-time)</td>
+                <td>Flat one-time fee to register Android developer profiles.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

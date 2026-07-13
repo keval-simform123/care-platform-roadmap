@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform - Phase 3: Testing, Security & Optimization</title>
+  <meta name="description" content="Phase 3: Enforcing security audits, authorization checks, beta user testing, battery performance audits, and bug fixing.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="layout-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">CP</div>
+        <div class="brand-name">
+          <h1>Care Platform</h1>
+          <p>Build Roadmap</p>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Overview Dashboard
+          </a>
+        </li>
+        <li class="nav-item" data-phase="0">
+          <a href="phase0.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+            Phase 0: Learning
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="1">
+          <a href="phase1.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            Phase 1: Backend
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="2">
+          <a href="phase2.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Phase 2: Android UI
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item active" data-phase="3">
+          <a href="phase3.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3: Testing
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tools.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Deployment & Tools
+          </a>
+        </li>
+      </nav>
+      
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">0 of 65 tasks completed</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content animate-fade-in">
+      <header class="page-header">
+        <div class="page-title">
+          <h2>Phase 3: Testing, Security & Optimization</h2>
+          <p>Audit codebases, execute permission checks, launch beta releases, and optimize vitals performance.</p>
+        </div>
+        <div class="meta-badges">
+          <div class="badge badge-info">Duration: Month 4+</div>
+          <div class="badge badge-accent">Goal: Production-Grade App</div>
+        </div>
+      </header>
+
+      <!-- Phase 3 Grid Cards -->
+      <div class="dashboard-grid">
+        <!-- Interactive Checklists for Phase 3 -->
+        <div class="glass-card col-8">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-danger);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3 Progress Tracker
+          </h3>
+          
+          <div class="task-list">
+            <!-- Task 1 -->
+            <label class="task-item" for="p3-task1">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task1">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Perform Backend Security Hardening (Week 13-14)</span>
+                <span class="task-desc">Enforce HTTPS redirections, rate limit authentication routes, block CORS request leaks, and hide passwords from logs.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Security</span>
+                  <span class="task-badge">Weeks 13-14</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 2 -->
+            <label class="task-item" for="p3-task2">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task2">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Perform Android Security Audits</span>
+                <span class="task-desc">Secure cached tokens in DataStore preferences, confirm tokens wipe clean on logouts, and mask API keys.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Security</span>
+                  <span class="task-badge">Weeks 13-14</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 3 -->
+            <label class="task-item" for="p3-task3">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task3">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Run Backend Unit Test Queries (Week 15-16)</span>
+                <span class="task-desc">Verify incorrect login attempts trigger 400 validation failures and unassigned caregiver requests return 403.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Testing</span>
+                  <span class="task-badge">Weeks 15-16</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 4 -->
+            <label class="task-item" for="p3-task4">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task4">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Execute Android Manual Testing</span>
+                <span class="task-desc">Manually trigger SOS cycles, verify location updates persist in the background, and confirm offline states handle gracefully.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Testing</span>
+                  <span class="task-badge">Weeks 15-16</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 5 -->
+            <label class="task-item" for="p3-task5">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task5">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Validate Android Version & SDK Support</span>
+                <span class="task-desc">Verify screen responsiveness and background threads work on Android versions 8.0 through 14.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Testing</span>
+                  <span class="task-badge">Weeks 15-16</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 6 -->
+            <label class="task-item" for="p3-task6">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task6">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Recruit Beta Testers (Week 17-18)</span>
+                <span class="task-desc">Gather 15-30 real users (comprising elderly relatives, families, and caregivers) for a 2-week active testing trial.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Beta Track</span>
+                  <span class="task-badge">Weeks 17-18</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 7 -->
+            <label class="task-item" for="p3-task7">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task7">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Monitor Beta Crash Reports</span>
+                <span class="task-desc">Integrate crash loggers and note issues relating to message drops or alert notification delay.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Beta Track</span>
+                  <span class="task-badge">Weeks 17-18</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 8 -->
+            <label class="task-item" for="p3-task8">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task8">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Optimize Speed Metrics (Week 19-20)</span>
+                <span class="task-desc">Refine database queries, add indexes, and cache static assets to keep dashboard load times below 2 seconds.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Optimization</span>
+                  <span class="task-badge">Weeks 19-20</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 9 -->
+            <label class="task-item" for="p3-task9">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task9">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Audit Battery & Data Consumption</span>
+                <span class="task-desc">Constrain GPS coordinates broadcasts to active SOS periods only, minimizing battery drain on older devices.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Optimization</span>
+                  <span class="task-badge">Weeks 19-20</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 10 -->
+            <label class="task-item" for="p3-task10">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p3-task10">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Complete Phase 3 Testing Checklist</span>
+                <span class="task-desc">Validate all manual test scripts and security audits return successful results. Codebase is certified stable.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Milestone</span>
+                  <span class="task-badge">Weeks 19-20</span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Security audit checklists -->
+        <div class="glass-card col-4">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-danger);"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Security Hardening
+          </h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+            <div class="mini-card" style="border-color: rgba(239, 68, 68, 0.15);">
+              <h4 style="font-size: 1rem; color: white;">Backend Security Audit</h4>
+              <ul style="font-size: 0.8rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                <li>Bcrypt password hashing</li>
+                <li>JWT expiration constraints</li>
+                <li>Enforce HTTPS rules</li>
+                <li>Express API rate limit controls</li>
+                <li>Mongoose query sanitization</li>
+              </ul>
+            </div>
+            
+            <div class="mini-card" style="border-color: rgba(239, 68, 68, 0.15);">
+              <h4 style="font-size: 1rem; color: white;">Client Security Audit</h4>
+              <ul style="font-size: 0.8rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                <li>Encrypted DataStore tokens</li>
+                <li>Purge credentials on logout</li>
+                <li>Mask API secrets</li>
+                <li>Verify runtime GPS permissions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manual Unit Test Cases Tabbed -->
+      <section class="glass-card col-12 tabs-wrapper">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-secondary);"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+          Manual Testing Cases (Weeks 15-16)
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          These core test matrices should be executed manually before beta user release.
+        </p>
+
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="test-auth">Auth Validation</button>
+          <button class="tab-btn" data-tab="test-permissions">Role Permissions</button>
+          <button class="tab-btn" data-tab="test-sos">Emergency SOS</button>
+        </div>
+
+        <!-- Auth -->
+        <div class="tab-pane active" data-tab-content="test-auth">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Test Case</th>
+                  <th>Execution Step</th>
+                  <th>Expected Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Valid Registration</td>
+                  <td>Submit registration form with unique email and valid passwords.</td>
+                  <td>API returns 201 Created; passwords appear fully hashed in database.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Duplicated Email Checks</td>
+                  <td>Attempt registration with an email address already registered.</td>
+                  <td>API intercepts, preventing duplication, and returns 400 Bad Request.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Invalid Credentials Login</td>
+                  <td>Input incorrect passwords for an existing account and click login.</td>
+                  <td>Backend denies access, returning 401 Unauthorized.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Expired Token Validation</td>
+                  <td>Attempt accessing dashboard routes with a stale or expired JWT token.</td>
+                  <td>API intercepts, returning 401 Unauthorized, and routes client back to login screen.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Permissions -->
+        <div class="tab-pane" data-tab-content="test-permissions">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Test Case</th>
+                  <th>Execution Step</th>
+                  <th>Expected Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Cross-Family Data Leak Blocks</td>
+                  <td>Request vitals of Elderly relative A using Family member B's token.</td>
+                  <td>Middleware halts execution, returning 403 Forbidden. Access is blocked.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Caregiver Scope Validation</td>
+                  <td>Attempt accessing client records of an unassigned patient.</td>
+                  <td>Middleware validates relationship maps and yields 403 Forbidden.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Unassigned Chat Blocks</td>
+                  <td>Dispatch a message object between users with no established links.</td>
+                  <td>API verifies relationships, blocking dispatch, and returns 403.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SOS -->
+        <div class="tab-pane" data-tab-content="test-sos">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Test Case</th>
+                  <th>Execution Step</th>
+                  <th>Expected Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 600; color: white;">SOS Database Persistence</td>
+                  <td>Tap the red SOS button and trigger the emergency handler.</td>
+                  <td>Active SOS record is logged with coordinates before push notices trigger.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Dynamic Location Tracking</td>
+                  <td>Move client device while emergency is active.</td>
+                  <td>Latitude/Longitude coordinates update every 10s on the tracking database.</td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 600; color: white;">Emergency Resolution</td>
+                  <td>Tap resolve button from linked family member panel.</td>
+                  <td>SOS status updates to 'resolved' and family maps are updated.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform - Phase 0: Foundation & Learning</title>
+  <meta name="description" content="Phase 0: Learning Android Fundamentals and planning the backend database schema for the Care Platform application.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="layout-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">CP</div>
+        <div class="brand-name">
+          <h1>Care Platform</h1>
+          <p>Build Roadmap</p>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Overview Dashboard
+          </a>
+        </li>
+        <li class="nav-item active" data-phase="0">
+          <a href="phase0.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+            Phase 0: Learning
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="1">
+          <a href="phase1.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            Phase 1: Backend
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="2">
+          <a href="phase2.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Phase 2: Android UI
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="3">
+          <a href="phase3.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3: Testing
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tools.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Deployment & Tools
+          </a>
+        </li>
+      </nav>
+      
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">0 of 65 tasks completed</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content animate-fade-in">
+      <header class="page-header">
+        <div class="page-title">
+          <h2>Phase 0: Foundation & Learning</h2>
+          <p>Learn Android UI foundations, basic REST API data structures, and establish your architecture.</p>
+        </div>
+        <div class="meta-badges">
+          <div class="badge badge-info">Duration: Weeks 1 - 2</div>
+          <div class="badge badge-accent">Goal: Plan & Prepare</div>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        <!-- Interactive Checklists for Phase 0 -->
+        <div class="glass-card col-8">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+            Phase 0 Progress Tracker
+          </h3>
+          
+          <div class="task-list">
+            <!-- Task 1 -->
+            <label class="task-item" for="p0-task1">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task1">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Learn Android Basics Concepts (Day 1-2)</span>
+                <span class="task-desc">Understand Activities, Fragments, Services, Intent, and the Android Manifest file.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 1</span>
+                  <span class="task-badge">2 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 2 -->
+            <label class="task-item" for="p0-task2">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task2">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Google's Android Basics course (Day 1-2)</span>
+                <span class="task-desc">Complete modules: "My first Android app" and "Building app UI" on Android Basics with Compose.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 1</span>
+                  <span class="task-badge">2 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 3 -->
+            <label class="task-item" for="p0-task3">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task3">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Build a Tiny To-Do list app (Day 3)</span>
+                <span class="task-desc">Practice with Jetpack Compose using input fields, button triggers, and lists to understand compiling.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 1</span>
+                  <span class="task-badge">4 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 4 -->
+            <label class="task-item" for="p0-task4">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task4">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Understand Backend & API Basics (Day 4-5)</span>
+                <span class="task-desc">Learn about REST APIs, JSON return values, HTTP verbs, and Database tokens/hashes.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 1</span>
+                  <span class="task-badge">3 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 5 -->
+            <label class="task-item" for="p0-task5">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task5">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Validate Week 1 Deliverables</span>
+                <span class="task-desc">Ensure Android Studio is working, tiny app runs on device/emulator, and API verbs are understood.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 1</span>
+                  <span class="task-badge">Milestone</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 6 -->
+            <label class="task-item" for="p0-task6">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task6">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Evaluate Backend Options (Day 1-2)</span>
+                <span class="task-desc">Compare Firebase (easier, scales exp) vs Node/Express/MongoDB (full control, healthcare compliant).</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 2</span>
+                  <span class="task-badge">1 Hour</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 7 -->
+            <label class="task-item" for="p0-task7">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task7">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Confirm Node.js + Express Selection</span>
+                <span class="task-desc">Decide stack choice: Node.js, Express, MongoDB Atlas for Care Platform development.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 2</span>
+                  <span class="task-badge">1 Hour</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 8 -->
+            <label class="task-item" for="p0-task8">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task8">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Document Database Schemas (Day 3-4)</span>
+                <span class="task-desc">Write schemas for Users, HealthRecords, Emergencies, and assign relationships.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 2</span>
+                  <span class="task-badge">3 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 9 -->
+            <label class="task-item" for="p0-task9">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task9">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Outline API Endpoints & Auth Permissions</span>
+                <span class="task-desc">Write endpoints list like /auth/register, /emergency/sos and map role access (Elderly, Family, Caregiver).</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 2</span>
+                  <span class="task-badge">3 Hours</span>
+                </div>
+              </div>
+            </label>
+
+            <!-- Task 10 -->
+            <label class="task-item" for="p0-task10">
+              <div class="task-checkbox-container">
+                <input type="checkbox" id="p0-task10">
+                <span class="checkmark"></span>
+              </div>
+              <div class="task-content">
+                <span class="task-title">Confirm End of Phase 0 Checklist</span>
+                <span class="task-desc">Validate all Week 2 deliverables and learning parameters are satisfied. Ready to code backend.</span>
+                <div class="task-meta">
+                  <span class="task-badge">Week 2</span>
+                  <span class="task-badge">Milestone</span>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Details, Links & Schemas -->
+        <div class="glass-card col-4">
+          <h3>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-secondary);"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+            Key Learning Resources
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+            <div class="mini-card">
+              <h4>Android Basics (Compose)</h4>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Official Google training on Jetpack Compose and Kotlin variables.</p>
+              <a href="https://developer.android.com/courses/android-basics-compose/course" target="_blank" class="copy-btn" style="text-decoration: none; font-size: 0.75rem;">Go to Course</a>
+            </div>
+            
+            <div class="mini-card">
+              <h4>Node.js Express Tutorial</h4>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Traversy Media: Express and Node setup crash course on YouTube.</p>
+              <a href="https://www.youtube.com/watch?v=L72fhGm1tfE" target="_blank" class="copy-btn" style="text-decoration: none; font-size: 0.75rem;">Watch on YouTube</a>
+            </div>
+
+            <div class="mini-card">
+              <h4>Firebase Codelabs</h4>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.75rem;">Google Codelabs for getting started with Firebase Authentication/Cloud Stores.</p>
+              <a href="https://firebase.google.com/codelabs" target="_blank" class="copy-btn" style="text-decoration: none; font-size: 0.75rem;">Firebase Codelab</a>
+            </div>
+          </div>
+
+          <div class="callout callout-warning">
+            <h4>Planning is Critical</h4>
+            <p style="font-size: 0.85rem;">"1 hour spent planning your database relationships now saves 10 hours of backend and mobile rewriting loops later."</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schemas & Database Collections Tabs -->
+      <section class="glass-card col-12 tabs-wrapper">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-secondary);"><path d="M4 22V4c0-.5.2-1 .6-1.4C5 2.2 5.5 2 6 2h12c.5 0 1 .2 1.4.6.4.4.6.9.6 1.4v18l-8-4-8 4z"/></svg>
+          Phase 0: Planned Database Schema
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          These collections define the MongoDB databases planned during Week 2. You will implement these in Phase 1.
+        </p>
+
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="schema-users">Users</button>
+          <button class="tab-btn" data-tab="schema-health">HealthRecords</button>
+          <button class="tab-btn" data-tab="schema-emergency">Emergencies</button>
+        </div>
+
+        <div class="tab-pane active" data-tab-content="schema-users">
+          <div class="prompt-box" style="margin: 0;">
+            <div class="prompt-header">
+              <span class="prompt-label">Users Collection Schema</span>
+              <button class="copy-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Schema
+              </button>
+            </div>
+            <pre class="prompt-content">Users Collection:
+- _id (unique ID generated by MongoDB)
+- name (string, required)
+- email (string, unique, required)
+- passwordHash (string, hashed using bcryptjs)
+- role (enum: 'elderly', 'family', 'caregiver', 'admin')
+- phone (string)
+- profilePicture (string URL)
+- createdAt (timestamp)</pre>
+          </div>
+        </div>
+
+        <div class="tab-pane" data-tab-content="schema-health">
+          <div class="prompt-box" style="margin: 0;">
+            <div class="prompt-header">
+              <span class="prompt-label">HealthRecords Collection Schema</span>
+              <button class="copy-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Schema
+              </button>
+            </div>
+            <pre class="prompt-content">HealthRecords Collection:
+- _id (unique ID)
+- elderlyUserId (reference to Users._id)
+- bloodPressure (object: { systolic: number, diastolic: number })
+- bloodSugar (number, mg/dl)
+- heartRate (number, bpm)
+- bodyTemperature (number, °F)
+- weight (number, lbs)
+- mood (number, 1-10 scale)
+- sleepHours (number)
+- notes (string, caregiver observations)
+- recordedBy (reference to Users._id caregiver)
+- createdAt (timestamp)</pre>
+          </div>
+        </div>
+
+        <div class="tab-pane" data-tab-content="schema-emergency">
+          <div class="prompt-box" style="margin: 0;">
+            <div class="prompt-header">
+              <span class="prompt-label">Emergency Collection Schema</span>
+              <button class="copy-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Schema
+              </button>
+            </div>
+            <pre class="prompt-content">Emergency Collection:
+- _id (unique ID)
+- elderlyUserId (reference to Users._id)
+- status (enum: 'active', 'resolved', 'false_alarm')
+- latitude (number, coordinates)
+- longitude (number, coordinates)
+- locationUpdatedAt (timestamp)
+- description (string)
+- triggeredAt (timestamp)
+- resolvedAt (timestamp)
+- notifiedContacts (array of reference Users._id)
+- severity (enum: 'low', 'medium', 'high')</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

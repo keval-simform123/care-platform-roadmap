@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform - Phase 2: Android App Development</title>
+  <meta name="description" content="Phase 2: Building Android Client UI with Jetpack Compose, Retrofit endpoints, secure DataStores, and Firebase messaging.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+  <script>
+    // Local script to drive the Mobile Prompt Library
+    const MOBILE_PROMPTS = {
+      gradle: `Add these dependencies to Android build.gradle.kts:
+
+Libraries needed:
+- Retrofit (HTTP client for calling APIs)
+- OkHttp (HTTP interceptor for adding JWT token)
+- Gson (JSON parsing)
+- Jetpack Compose (UI framework - easier than XML)
+- Navigation (screen navigation)
+- DataStore (secure local storage for JWT token)
+- Coroutines (async tasks)
+
+Provide: Updated build.gradle.kts with all dependencies and versions`,
+
+      apiclient: `Create Retrofit API client setup:
+
+File: api/ApiClient.kt
+
+Requirements:
+- ApiService interface with methods for all backend endpoints
+  (You'll build this as we go, start with: login, register, getElderly)
+- Interceptor that adds JWT token to every request header:
+  Authorization: Bearer {token}
+- Base URL: http://your-backend-url:5000 (we'll change later)
+- Timeout: 30 seconds
+- Error handling for network errors
+
+Include: Example methods for login and register`,
+
+      tokenstore: `Create secure token storage using DataStore:
+
+File: data/TokenManager.kt
+
+Functions:
+- saveToken(token: String) - save JWT token
+- getToken(): String? - retrieve token
+- deleteToken() - logout
+- isLoggedIn(): Boolean
+
+Make sure:
+- Uses DataStore (secure, encrypted)
+- Tokens persist across app restarts
+- Can be cleared on logout`,
+
+      authScreen: `Create Login and Register screens using Jetpack Compose:
+
+File: ui/screens/LoginScreen.kt, RegisterScreen.kt
+
+LoginScreen:
+- Email input field
+- Password input field
+- Login button
+- Link to 'Create account'
+- Show loading indicator while calling API
+- Show error message if login fails
+- On successful login:
+  - Save token
+  - Navigate to dashboard
+
+RegisterScreen:
+- Name input
+- Email input
+- Password input
+- Phone input
+- Role selector (elderly, family, caregiver)
+- Register button
+- Show validation errors (email format, password length)
+- On success: show 'Account created, please login'
+
+Both screens:
+- Large buttons (accessibility for elderly)
+- Simple, clean design
+- Error messages in red
+- Use your app's color scheme`,
+
+      navGraph: `Create navigation graph for entire app:
+
+File: ui/navigation/NavGraph.kt
+
+Navigation flow:
+- Start: LoginScreen
+- If logged in + role=elderly → ElderlyDashboard
+- If logged in + role=family → FamilyDashboard
+- If logged in + role=caregiver → CaregiverDashboard
+- If logged in + role=admin → AdminDashboard
+
+Each dashboard has bottom navigation:
+- Elderly: Home, Health, Appointments, Messages, Profile
+- Family: Dashboard, Alerts, Location, Messages, Profile
+- Caregiver: MyVisits, HealthRecords, Messages, Notifications, Profile
+- Admin: Statistics, Users, Emergencies, Announcements
+
+Use Jetpack Navigation component.
+Show me the NavGraph and how to navigate between screens.`,
+
+      elderlyDash: `Create Elderly Dashboard UI:
+
+File: ui/screens/elderly/ElderlyDashboardScreen.kt
+
+Components:
+1. Top Section (Profile Card)
+   - Display: Profile picture, name, age, blood group
+   - Big Emergency/SOS button (RED, easy to tap)
+
+2. Health Summary (Today's Health)
+   - Last BP reading: Show as 'BP: 120/80'
+   - Last Blood Sugar: 'Sugar: 110 mg/dl'
+   - Heart Rate: 'HR: 78 bpm'
+   - Display in cards, large text
+
+3. Medicine Reminders (Today's Medicines)
+   - List today's medications
+   - Show time, medicine name, dosage
+   - Button: 'Mark as Taken' for each
+   - Color: Green if taken, Red if missed
+
+4. Upcoming Appointments (Next 3)
+   - Show date, time, doctor name, hospital
+   - One-click reminder option
+
+5. Messages (Latest 3)
+   - Show 'You have 5 new messages'
+   - Quick access to open messages
+
+6. Bottom Actions
+   - Call Caregiver (direct phone call or video)
+   - Share Location
+   - View Full Reports
+
+Make sure:
+- Large text (16sp+)
+- Large buttons (48dp minimum height)
+- High contrast colors
+- Clear visual hierarchy
+- Loading state while fetching data from API
+
+Use Retrofit to call:
+- GET /elderly/me (user profile)
+- GET /elderly/me/health-records/latest
+- GET /elderly/me/medications?status=active
+- GET /elderly/me/appointments?status=scheduled
+- GET /messages/unread`,
+
+      healthCharts: `Create Health Records screen:
+
+File: ui/screens/HealthRecordsScreen.kt
+
+Components:
+1. Date Range Filter
+   - Buttons: 'This week', 'This month', 'All time'
+   - Or date picker for custom range
+
+2. Chart Display
+   - Blood Pressure chart (line graph, systolic and diastolic)
+   - Blood Sugar chart
+   - Heart Rate chart
+   - X-axis: dates, Y-axis: values
+   - Use library: 'com.github.PhilJay:MPAndroidChart' or Jetpack Compose Charts
+
+3. List View
+   - Each health record shown as expandable card
+   - Click to see details: time, all values, caregiver notes
+
+4. Add Button (Caregiver only)
+   - Tap to open form:
+     - BP input (systolic/diastolic)
+     - Blood sugar
+     - Heart rate
+     - Temperature
+     - Weight
+     - Mood (1-10 slider)
+     - Sleep hours
+     - Notes
+   - Submit button calls: POST /elderly/:id/health-records
+
+Include:
+- Charts update as new data added
+- Validation: BP range 0-300, sugar 0-500
+- Loading while submitting
+- Success/error messages`
+    };
+
+    function changeMobilePrompt(key) {
+      const display = document.getElementById('selected-mobile-content');
+      if (display && MOBILE_PROMPTS[key]) {
+        display.textContent = MOBILE_PROMPTS[key];
+        
+        // Remove active class from selector buttons
+        document.querySelectorAll('.mobile-selector-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        // Add to clicked button
+        event.currentTarget.classList.add('active');
+      }
+    }
+  </script>
+  <style>
+    .mobile-selector-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      margin-bottom: 0.5rem;
+    }
+    .mobile-selector-btn:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: white;
+    }
+    .mobile-selector-btn.active {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--color-success);
+      color: white;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">CP</div>
+        <div class="brand-name">
+          <h1>Care Platform</h1>
+          <p>Build Roadmap</p>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Overview Dashboard
+          </a>
+        </li>
+        <li class="nav-item" data-phase="0">
+          <a href="phase0.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+            Phase 0: Learning
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="1">
+          <a href="phase1.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            Phase 1: Backend
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item active" data-phase="2">
+          <a href="phase2.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Phase 2: Android UI
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="3">
+          <a href="phase3.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3: Testing
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tools.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Deployment & Tools
+          </a>
+        </li>
+      </nav>
+      
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">0 of 65 tasks completed</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content animate-fade-in">
+      <header class="page-header">
+        <div class="page-title">
+          <h2>Phase 2: Android App Development</h2>
+          <p>Construct the Kotlin client app. Build dashboards for each user role and tie them to backend APIs.</p>
+        </div>
+        <div class="meta-badges">
+          <div class="badge badge-info">Duration: Month 2 - 3</div>
+          <div class="badge badge-accent">Goal: Connected Kotlin Client</div>
+        </div>
+      </header>
+
+      <!-- Week tabs -->
+      <section class="glass-card col-12 tabs-wrapper" style="margin-bottom: 3rem;">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-success);"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/></svg>
+          Phase 2 Week-by-Week Execution
+        </h3>
+        
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="p2-w1">Week 5-6: Nav & Auth</button>
+          <button class="tab-btn" data-tab="p2-w2">Week 7-8: Dashboards</button>
+          <button class="tab-btn" data-tab="p2-w3">Week 9-10: Features</button>
+          <button class="tab-btn" data-tab="p2-w4">Week 11-12: Polish</button>
+        </div>
+
+        <!-- Week 5-6 -->
+        <div class="tab-pane active" data-tab-content="p2-w1">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p2-task1">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task1">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Create Android Studio Project</span>
+                    <span class="task-desc">Open Android Studio and choose "Empty Activity" template, Kotlin language, Minimum API 26 (Android 8.0+).</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task2">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task2">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Configure Gradle Dependencies</span>
+                    <span class="task-desc">Add libraries: Retrofit (HTTP clients), Gson (JSON parsing), Jetpack Compose, DataStore (Encrypted token store).</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task3">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task3">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Write Retrofit ApiClient Setup</span>
+                    <span class="task-desc">In `api/ApiClient.kt`, code service declarations and interceptors attaching token header checks.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task4">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task4">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Implement Secure TokenManager DataStore</span>
+                    <span class="task-desc">Code `data/TokenManager.kt` saving, retrieving, and clearing JWT login credentials.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task5">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task5">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Login Screen (Jetpack Compose)</span>
+                    <span class="task-desc">Implement email and password text fields, login hooks, progress rings, and error messages.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task6">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task6">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Register Screen UI</span>
+                    <span class="task-desc">Add registration form containing fields for name, role selector, phone number, and validation indicators.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task7">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task7">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Navigation Graph (NavGraph.kt)</span>
+                    <span class="task-desc">Write navigation routes forwarding users to appropriate dashboards based on authenticated roles.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="callout callout-info" style="margin: 0;">
+                <h4>Encrypted DataStore</h4>
+                <p style="font-size: 0.85rem;">Do not utilize standard SharedPreferences for storing login tokens. Standard XML files are unencrypted on rooted phones. Always use Preference DataStore or EncryptedSharedPreferences.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 7-8 -->
+        <div class="tab-pane" data-tab-content="p2-w2">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p2-task8">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task8">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Elderly Dashboard UI</span>
+                    <span class="task-desc">Incorporate large text fields, a red SOS button, medication ticks, and simple contact caregiver cards.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task9">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task9">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Family Member Dashboard UI</span>
+                    <span class="task-desc">Create metrics overview representing vitals details, progress trackers, and real-time emergency banners.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task10">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task10">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Caregiver Dashboard UI</span>
+                    <span class="task-desc">Create patient lists, visit calendar feeds, assignment indicators, and alert notifications.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task11">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task11">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Admin Dashboard UI</span>
+                    <span class="task-desc">Build system usage statistics dashboard showing active users and pending caregiver approvals.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="callout callout-warning" style="margin: 0;">
+                <h4>Accessibility details</h4>
+                <p style="font-size: 0.85rem;">Elderly dashboards must utilize:
+                  <br>• Font sizes of at least 16sp
+                  <br>• High-contrast backgrounds
+                  <br>• Touch targets of at least 48dp height
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 9-10 -->
+        <div class="tab-pane" data-tab-content="p2-w3">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p2-task12">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task12">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build HealthRecords screen with charts</span>
+                    <span class="task-desc">Integrate MPAndroidChart to draw blood pressure trends, blood glucose levels, and heart rate logs.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task13">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task13">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Medications calendar list</span>
+                    <span class="task-desc">Integrate checkboxes for active medication schedules (taken, missed, skipped) and compliance bars.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task14">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task14">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Appointments dashboard</span>
+                    <span class="task-desc">Show doctor availability calendar, hospitals, scheduled checkups, and reminder alarms.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task15">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task15">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Messages chat screen UI</span>
+                    <span class="task-desc">Create message list with timestamps, sender bubbles, auto-scrolling, and location pinning attachments.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task16">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task16">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Activities logger UI</span>
+                    <span class="task-desc">Include input forms for caregiver activity logging (meals, sleep duration, walking exercises).</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task17">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task17">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Emergency/SOS UI with tracking maps</span>
+                    <span class="task-desc">Build emergency state displays, showing Google Maps routes and coordinate tracking.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="callout callout-info" style="margin: 0;">
+                <h4>Vitals Charts integration</h4>
+                <p style="font-size: 0.85rem;">Use standard libraries like PhilJay's MPAndroidChart in your dependencies for simple line charts, or compose-based Canvas drawings to prevent memory leaks on old tablets.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 11-12 -->
+        <div class="tab-pane" data-tab-content="p2-w4">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p2-task18">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task18">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Integrate Firebase Cloud Messaging (FCM)</span>
+                    <span class="task-desc">Implement `FirebaseMessagingService` with registration tokens saved to the backend to support instant notifications.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task19">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task19">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Settings & notification toggles</span>
+                    <span class="task-desc">Write profile editing forms, notification choice buttons, and system language preferences.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task20">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task20">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Network Error/Blank State banners</span>
+                    <span class="task-desc">Add generic fallback layout panels showing "No Internet Connection" or "No Records Found".</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p2-task21">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p2-task21">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Complete Phase 2 Testing Check</span>
+                    <span class="task-desc">Ensure all Kotlin view models bind smoothly with backend routes. The app is ready for beta release.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="mini-card">
+                <h4>FCM Channels checklist</h4>
+                <ul style="font-size: 0.8rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                  <li>High importance for SOS alert channels</li>
+                  <li>Default sound for message alerts</li>
+                  <li>Request runtime permissions on Android 13+</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- App Architecture Outline -->
+      <section class="glass-card col-12" style="margin-bottom: 3rem;">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-success);"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Mobile-to-Backend Architecture Flow
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          How the Kotlin client connects securely to your deployed Express APIs.
+        </p>
+
+        <div style="background: rgba(0,0,0,0.2); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-glass); line-height: 1.8; font-size: 0.95rem;">
+          <ol style="padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; color: var(--text-secondary);">
+            <li><strong style="color: white;">Authentication Step</strong>: User enters details on Login Screen. App calls <code style="font-family: var(--font-mono); color: var(--color-secondary);">POST /auth/login</code>.</li>
+            <li><strong style="color: white;">Token Storage</strong>: On success, JSON response returns a JWT string. App caches it in DataStore.</li>
+            <li><strong style="color: white;">OkHttp Interceptor</strong>: Subsequent API queries pass through an interceptor inserting the cached token:
+              <br><code style="font-family: var(--font-mono); color: var(--color-primary); background: rgba(0,0,0,0.3); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">Authorization: Bearer {JWT_TOKEN}</code>.
+            </li>
+            <li><strong style="color: white;">Dynamic Navigation</strong>: Home screen loads. Retrofit fires GET requests based on stored user roles (e.g. <code style="font-family: var(--font-mono); color: var(--color-secondary);">/elderly/me</code>).</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- Interactive Claude Code Prompt Library (Mobile Focus) -->
+      <section class="glass-card col-12">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-success);"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+          Claude Kotlin Prompt Library
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          Select a mobile prompt template. Copy to clipboard and run inside Claude Code Pro to generate client scripts.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem;">
+          <!-- Selector Column -->
+          <div style="border-right: 1px solid var(--border-glass); padding-right: 1.5rem;">
+            <button class="mobile-selector-btn active" onclick="changeMobilePrompt('gradle')">Gradle Dependencies</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('apiclient')">Retrofit API Client</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('tokenstore')">TokenManager (DataStore)</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('authScreen')">Login & Register Screens</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('navGraph')">Navigation Setup</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('elderlyDash')">Elderly UI Dashboard</button>
+            <button class="mobile-selector-btn" onclick="changeMobilePrompt('healthCharts')">Vitals Charts screen</button>
+          </div>
+
+          <!-- Output Box Column -->
+          <div class="prompt-box" style="margin: 0;">
+            <div class="prompt-header">
+              <span class="prompt-label" id="selected-mobile-title">Kotlin Template Prompt</span>
+              <button class="copy-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Prompt
+              </button>
+            </div>
+            <pre class="prompt-content" id="selected-mobile-content">Add these dependencies to Android build.gradle.kts:
+
+Libraries needed:
+- Retrofit (HTTP client for calling APIs)
+- OkHttp (HTTP interceptor for adding JWT token)
+- Gson (JSON parsing)
+- Jetpack Compose (UI framework - easier than XML)
+- Navigation (screen navigation)
+- DataStore (secure local storage for JWT token)
+- Coroutines (async tasks)
+
+Provide: Updated build.gradle.kts with all dependencies and versions</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

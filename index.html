@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform — Learning Expedition Route</title>
+  <meta name="description" content="A wobbly wended path through app development tracks. Designed for calm, clear, self-paced progress.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&family=Public+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- GSAP & ScrollTrigger CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  
+  <!-- Lenis Smooth Scroll CDN -->
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.27/dist/lenis.min.js"></script>
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- Main Logic -->
+  <script src="script.js" defer></script>
+</head>
+<body>
+  
+  <!-- Custom Eased Cursor -->
+  <div class="custom-cursor" id="custom-cursor">
+    <div class="cursor-ring">
+      <!-- Locked Glyph inside ring -->
+      <svg class="cursor-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="cursor-dot"></div>
+    <div class="cursor-text" id="cursor-text">View</div>
+  </div>
+
+  <div class="app-layout">
+    
+    <!-- Left Column: The Interactive Transit Map -->
+    <main class="map-container" id="map-container">
+      
+      <!-- Faint sweeping topographic curves for visual anchoring -->
+      <div class="topo-bg" id="topo-bg">
+        <svg viewBox="0 0 1000 1200" fill="none" stroke="var(--color-stone)" stroke-width="1.5" stroke-opacity="0.04">
+          <path d="M-100 150 C 200 300, 100 80, 500 320 C 900 560, 600 200, 1100 600" />
+          <path d="M-100 450 C 300 600, 200 380, 600 620 C 1000 860, 700 500, 1100 900" />
+          <path d="M-100 750 C 400 900, 300 680, 700 920 C 1100 1160, 800 800, 1100 1200" />
+        </svg>
+      </div>
+
+      <header class="map-header">
+        <span class="route-subtitle">EXPEDITION ROADMAP</span>
+        <h1 class="route-title">Care Platform</h1>
+        <p class="route-intro">
+          App development contains real branching and dependencies. Master core skills on the spine, then choose Node 04 to unlock backend or mobile specialization tracks.
+        </p>
+        
+        <!-- Legend -->
+        <div class="map-legend">
+          <div class="legend-item"><span class="legend-dot dot-foundation"></span>Core Spine</div>
+          <div class="legend-item"><span class="legend-dot dot-mobile"></span>Mobile Track</div>
+          <div class="legend-item"><span class="legend-dot dot-backend"></span>Backend Track</div>
+        </div>
+      </header>
+      
+      <div class="map-scroll-area" id="map-scroll-area">
+        
+        <!-- Onboarding Briefing Card (Dismissible callout) -->
+        <div class="onboarding-callout" id="onboarding-callout">
+          <div class="onboarding-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <path d="M12 8h.01"/>
+            </svg>
+          </div>
+          <div class="onboarding-text">
+            <h4 class="onboarding-title">Expedition Briefing</h4>
+            <p class="onboarding-desc">
+              Every learner starts on the Core Pathway. At Stage 04, you'll choose a specialization—Mobile or Backend—and that track will unlock. You can always return to complete the alternative path later.
+            </p>
+          </div>
+          <button class="onboarding-dismiss-btn" id="onboarding-dismiss-btn">
+            Got it
+          </button>
+        </div>
+
+        <!-- SVG Canvas for the organic wobbly connecting lines -->
+        <svg class="map-svg" id="map-svg" aria-hidden="true">
+          <g id="paths-group"></g>
+        </svg>
+        
+        <!-- You Are Here Flag (Floating Anchor Redesigned) -->
+        <div class="you-are-here-flag" id="you-are-here-flag">
+          <div class="flag-pin-drop">
+            <svg class="pin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <span class="flag-label">you are here</span>
+        </div>
+        
+        <!-- Column-based grid layout for tracks -->
+        <div class="tracks-grid">
+          
+          <!-- Column 1: Mobile Specialization (Left Column) -->
+          <div class="track-col track-mobile-col inactive-branch" id="col-mobile">
+            <div class="column-header">
+              <span class="mono-label">MOBILE TRACK</span>
+              <h3>Unlocks at Stage 04</h3>
+            </div>
+            
+            <!-- Node M1 (Compose) -->
+            <div class="node-wrapper" style="margin-top: 38rem;">
+              <button class="map-node node-mobile" id="node-m1" data-id="m1" data-weight="Medium (8h)" data-title="Build an interactive Compose screen" data-tech="Jetpack Compose" data-prereq="node-4">
+                <span class="node-inner">cmp</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Compose Screen</div>
+            </div>
+            
+            <!-- Node M2 (ViewModel) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-mobile" id="node-m2" data-id="m2" data-weight="Large (16h)" data-title="Manage state with ViewModel" data-tech="ViewModel & LiveData" data-prereq="node-m1">
+                <span class="node-inner">vm</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">State Management</div>
+            </div>
+            
+            <!-- Node M3 (Room) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-mobile" id="node-m3" data-id="m3" data-weight="Large (20h)" data-title="Persist records locally in Room" data-tech="Room & SQLite" data-prereq="node-m2">
+                <span class="node-inner">db</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Room Database</div>
+            </div>
+            
+            <!-- Node M4 (WorkManager) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-mobile" id="node-m4" data-id="m4" data-weight="Medium (10h)" data-title="Schedule tasks with WorkManager" data-tech="WorkManager API" data-prereq="node-m3">
+                <span class="node-inner">bg</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Background Tasks</div>
+            </div>
+          </div>
+          
+          <!-- Column 2: Core Spine (Center Column) -->
+          <div class="track-col track-spine-col">
+            <div class="column-header">
+              <span class="mono-label">CORE PATHWAY</span>
+              <h3>Everyone starts here</h3>
+            </div>
+            
+            <!-- Node 1 (Install Tools) -->
+            <div class="node-wrapper" style="margin-top: 4rem;">
+              <button class="map-node node-foundation" id="node-1" data-id="1" data-weight="Small (2h)" data-title="Install development tools" data-tech="Android Studio, Node.js, Git" data-prereq="">
+                <span class="node-inner">init</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Install Tools</div>
+            </div>
+            
+            <!-- Node 2 (Kotlin Script) -->
+            <div class="node-wrapper" style="margin-top: 8rem;">
+              <button class="map-node node-foundation" id="node-2" data-id="2" data-weight="Medium (6h)" data-title="Write your first Kotlin script" data-tech="Kotlin Basics" data-prereq="node-1">
+                <span class="node-inner">kt</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Kotlin Scripting</div>
+            </div>
+            
+            <!-- Node 3 (XML) -->
+            <div class="node-wrapper" style="margin-top: 8rem;">
+              <button class="map-node node-foundation" id="node-3" data-id="3" data-weight="Medium (8h)" data-title="Build a layout with XML" data-tech="XML & Views" data-prereq="node-2">
+                <span class="node-inner">xml</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">XML Layouts</div>
+            </div>
+            
+            <!-- Node 4 (Fetch API - Decision Point Node Junction) -->
+            <div class="node-wrapper" style="margin-top: 8rem;">
+              <button class="map-node node-foundation node-junction" id="node-4" data-id="4" data-weight="Large (12h)" data-title="Fetch JSON data from an API" data-tech="HttpURLConnection & JSON" data-prereq="node-3">
+                <span class="node-inner">json</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label" style="font-weight: 800; color: var(--color-pine);">Junction Point</div>
+              <div class="junction-indicator">branching junction</div>
+            </div>
+            
+            <!-- Center spine node merges back at integration -->
+            <div class="node-wrapper" style="margin-top: 50rem;">
+              <div class="junction-indicator merge-indicator">pathway merge</div>
+              <button class="map-node node-deployment" id="node-t1" data-id="t1" data-weight="Large (16h)" data-title="Write integration tests" data-tech="Playwright & Postman" data-prereq="node-m4,node-b4">
+                <span class="node-inner">test</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Integration Tests</div>
+            </div>
+            
+            <!-- Node T2 (Security) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-deployment" id="node-t2" data-id="t2" data-weight="Small (4h)" data-title="Audit API security headers" data-tech="Helmet & CORS Settings" data-prereq="node-t1">
+                <span class="node-inner">sec</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Security Audit</div>
+            </div>
+            
+            <!-- Node T3 (Deploy API) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-deployment" id="node-t3" data-id="t3" data-weight="Medium (8h)" data-title="Deploy code to a cloud server" data-tech="DigitalOcean & Let's Encrypt" data-prereq="node-t2">
+                <span class="node-inner">srv</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Cloud Server</div>
+            </div>
+            
+            <!-- Node T4 (Play Store) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-deployment" id="node-t4" data-id="t4" data-weight="Large (14h)" data-title="Submit signed bundle to Play Store" data-tech="Google Play Console" data-prereq="node-t3">
+                <span class="node-inner">pub</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Release App</div>
+            </div>
+          </div>
+          
+          <!-- Column 3: Backend Specialization (Right Column) -->
+          <div class="track-col track-backend-col inactive-branch" id="col-backend">
+            <div class="column-header">
+              <span class="mono-label">BACKEND TRACK</span>
+              <h3>Unlocks at Stage 04</h3>
+            </div>
+            
+            <!-- Node B1 (Express Setup) -->
+            <div class="node-wrapper" style="margin-top: 38rem;">
+              <button class="map-node node-backend" id="node-b1" data-id="b1" data-weight="Medium (10h)" data-title="Serve API routes with Express" data-tech="Node.js & Express" data-prereq="node-4">
+                <span class="node-inner">api</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">REST API Setup</div>
+            </div>
+            
+            <!-- Node B2 (MongoDB) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-backend" id="node-b2" data-id="b2" data-weight="Medium (12h)" data-title="Connect routes to MongoDB" data-tech="Mongoose & MongoDB Atlas" data-prereq="node-b1">
+                <span class="node-inner">db</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Database Connection</div>
+            </div>
+            
+            <!-- Node B3 (JWT Auth) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-backend" id="node-b3" data-id="b3" data-weight="Large (18h)" data-title="Encrypt passwords and sign JWTs" data-tech="Bcrypt & JWT Session" data-prereq="node-b2">
+                <span class="node-inner">jwt</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">JWT Authentication</div>
+            </div>
+            
+            <!-- Node B4 (Socket.io) -->
+            <div class="node-wrapper" style="margin-top: 10rem;">
+              <button class="map-node node-backend" id="node-b4" data-id="b4" data-weight="Large (16h)" data-title="Stream live data using Socket.io" data-tech="WebSockets & Socket.io" data-prereq="node-b3">
+                <span class="node-inner">ws</span>
+                <div class="lock-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+              </button>
+              <div class="node-label">Live WebSockets</div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </main>
+    
+    <!-- Right Column: Persistent Dashboard and Detail Panel -->
+    <aside class="dashboard-panel">
+      
+      <!-- Persistent Header Status -->
+      <div class="panel-header">
+        <div class="you-are-here-indicator">
+          <span class="mono-label">COMPILER TARGET</span>
+          <h2 class="active-node-title"><span id="active-node-title">Install development tools</span><span class="terminal-cursor">▍</span></h2>
+          <span class="active-node-badge" id="active-node-badge">stage.01.init</span>
+        </div>
+        
+        <div class="progress-section">
+          <div class="progress-details">
+            <span class="mono-label">BUILD METRICS</span>
+            <span class="progress-text" id="progress-text">0/16 built</span>
+          </div>
+          <!-- Terminal Compile Progress Bar representation -->
+          <div class="terminal-build-bar">
+            <div class="terminal-fill" id="custom-progress-fill"></div>
+            <span class="terminal-percentage" id="terminal-percentage">0.0%</span>
+          </div>
+          <span class="mono-label" id="remaining-text" style="margin-top: 0.25rem; font-size: 0.62rem; opacity: 0.7;">16 stages remaining</span>
+        </div>
+      </div>
+      
+      <!-- Node Detail Workspace -->
+      <div class="panel-details" id="panel-details">
+        
+        <div class="detail-placeholder" id="detail-placeholder">
+          <p>Select any node on the route map to inspect its code objectives, requirements, and submit completions.</p>
+        </div>
+        
+        <div class="detail-content hidden" id="detail-content">
+          
+          <!-- Mentor Guidance Box (Mentor presence redesigned) -->
+          <div class="mentor-section" id="mentor-section">
+            <div class="mentor-header">
+              <div class="mentor-avatar-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                </svg>
+              </div>
+              <span class="mono-label" style="margin-bottom: 0;">MENTOR GUIDANCE</span>
+            </div>
+            
+            <p class="mentor-voice" id="mentor-voice">
+              "This is where most people either build a solid habit or quietly give up — take it slow, the tools matter more later than they seem to now."
+            </p>
+            
+            <div class="mentor-why-matters">
+              <span class="mono-label">WHY IT MATTERS</span>
+              <p class="why-matters-text" id="mentor-why-matters-text">
+                Getting comfortable with the tools early pays off forever.
+              </p>
+            </div>
+            
+            <div class="mentor-encouragement" id="mentor-encouragement">
+              You've got this — here's what to focus on.
+            </div>
+          </div>
+
+          <div class="rhythm-tick"></div>
+          
+          <!-- Technical Specs -->
+          <div class="node-header-group">
+            <span class="node-track-tag" id="detail-track-tag">Foundation</span>
+            <h3 class="node-detail-title" id="detail-title">Install development tools</h3>
+          </div>
+          
+          <div class="detail-meta-grid">
+            <div class="meta-item">
+              <span class="mono-label">ESTIMATED EFFORT</span>
+              <span class="meta-value" id="detail-weight">Small (2h)</span>
+            </div>
+            <div class="meta-item">
+              <span class="mono-label">TECHNOLOGIES TO USE</span>
+              <span class="meta-value" id="detail-tech">Android Studio, Node.js, Git</span>
+            </div>
+          </div>
+          
+          <div class="rhythm-tick secondary"></div>
+          
+          <div class="detail-description-section">
+            <span class="mono-label">MODULE OBJECTIVES</span>
+            <p class="node-detail-desc" id="detail-desc">
+              Configure your local IDE, setup Git version control, and prepare your terminal.
+            </p>
+          </div>
+          
+          <!-- Locked Stage Alert -->
+          <div class="locked-alert hidden" id="detail-locked-alert">
+            <div class="locked-illust-container">
+              <svg class="locked-illustration" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                <circle cx="12" cy="16" r="1.25"/>
+                <path d="M12 17.25V18.5"/>
+              </svg>
+            </div>
+            <div class="locked-text-wrap">
+              <span class="mono-label" style="color: var(--color-plum);">BUILD ERROR</span>
+              <h4 class="locked-headline">Prerequisites Unresolved</h4>
+              <p class="locked-desc" id="detail-locked-text">Complete the previous stage to unlock this path.</p>
+            </div>
+          </div>
+          
+          <!-- Action controls -->
+          <div class="detail-actions">
+            <button class="action-btn complete-btn" id="complete-btn">
+              Run build & commit
+            </button>
+            <button class="action-btn revert-btn hidden" id="revert-btn">
+              Rollback module commit
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+  </div>
+</body>
+</html>

@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Care Platform - Phase 1: Backend Development</title>
+  <meta name="description" content="Phase 1: Detailed roadmap for building the Node.js + Express backend with MongoDB Atlas, auth middleware, and SOS routes.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+  <script>
+    // Local script to drive the Prompt Center selector
+    const PROMPTS = {
+      server: `Create a basic Node.js Express server with:
+- MongoDB connection using Mongoose
+- CORS enabled
+- Environment variables (.env file)
+- PORT set to 5000
+- Basic route GET /health that returns {status: 'ok'}
+- Error handling middleware
+
+Structure:
+- Connect to MongoDB
+- Set up middleware
+- Create routes
+- Listen on PORT
+
+Show me server.js and .env.example`,
+
+      userModel: `Create a MongoDB Mongoose schema for User with:
+
+Fields:
+- name (string, required)
+- email (string, unique, required)
+- password (string, required - will be hashed)
+- phone (string)
+- role (enum: elderly, family, caregiver, admin)
+- profilePicture (string, URL)
+- createdAt (timestamp)
+
+Include:
+- Pre-save hook to hash password using bcryptjs
+- Method to compare passwords for login
+- Method to return user data without password
+
+File: models/User.js`,
+
+      authRoutes: `Create Express routes for authentication in routes/auth.js:
+
+Endpoints:
+1. POST /register
+   - Accept: name, email, password, phone, role
+   - Save user to MongoDB
+   - Hash password
+   - Return: {success: true, userId, message}
+   - Error handling: email already exists
+
+2. POST /login
+   - Accept: email, password
+   - Find user
+   - Compare password
+   - Return: {success: true, token, userId, role}
+   - Token should be JWT, valid for 7 days
+
+3. POST /verify-token
+   - Accept: token in Authorization header
+   - Return: {valid: true, userId, role}
+   - Error if token expired
+
+Include middleware to verify JWT token.
+File: routes/auth.js and middleware/auth.js`,
+
+      coreModels: `Create MongoDB Mongoose models for Care Platform:
+
+1. HealthRecord Model:
+   - elderlyUserId (reference to User)
+   - bloodPressure (systolic, diastolic)
+   - bloodSugar
+   - heartRate
+   - bodyTemperature
+   - weight
+   - mood (1-10 scale)
+   - sleepHours
+   - notes (caregiver observations)
+   - recordedBy (caregiver ID)
+   - createdAt
+
+2. Medication Model:
+   - elderlyUserId
+   - medicationName
+   - dosage
+   - frequency (daily, twice daily, etc)
+   - startDate
+   - endDate
+   - notes
+   - status (active, completed, stopped)
+   - createdBy (caregiver)
+
+3. MedicationLog Model:
+   - medicationId
+   - elderlyUserId
+   - scheduledTime
+   - takenAt (when actually taken, or null if missed)
+   - markedBy (who marked it)
+
+4. Appointment Model:
+   - elderlyUserId
+   - appointmentType (doctor, checkup, follow-up)
+   - hospitalName
+   - doctorName
+   - appointmentDate
+   - appointmentTime
+   - notes
+   - status (scheduled, completed, cancelled)
+   - createdBy (caregiver)
+
+5. Emergency Model:
+   - elderlyUserId
+   - status (active, resolved, false_alarm)
+   - latitude
+   - longitude
+   - locationUpdatedAt
+   - description
+   - triggeredAt
+   - resolvedAt
+   - notifiedContacts [] (array of user IDs notified)
+   - severity (low, medium, high)
+
+6. Message Model:
+   - senderId
+   - recipientId
+   - content
+   - messageType (text, location_share)
+   - isRead
+   - createdAt
+
+7. Activity Model:
+   - elderlyUserId
+   - activityType (walking, meal, exercise, shower, etc)
+   - duration (minutes)
+   - notes
+   - recordedBy (caregiver)
+   - createdAt
+
+For each model:
+- Include timestamps
+- Add indexes for fast queries
+- Add validation
+- Add relationships (references between models)
+
+Create separate files: models/HealthRecord.js, models/Medication.js, etc`,
+
+      middleware: `Create Express middleware for role-based access control:
+
+File: middleware/roleCheck.js
+
+Functions:
+1. requireRole(roles) - checks if user has required role
+   - requireRole(['elderly', 'family'])
+   - Returns 403 if user doesn't have role
+
+2. canAccessElderly(req, res, next)
+   - User can access if:
+     - User IS the elderly person
+     - User is a family member linked to elderly person
+     - User is a caregiver assigned to elderly person
+     - User is admin
+   - Check relationship in database
+   - Return 403 if unauthorized
+
+3. canAccessOwnData(req, res, next)
+   - User can only access their own data
+   - Except: family/caregiver can access assigned elderly's data
+
+Use in routes like:
+- router.get('/elderly/:id/health', canAccessElderly, getHealth)
+
+This prevents family member from seeing another family's data.`,
+
+      healthApis: `Create Express routes for health records:
+
+File: routes/healthRecords.js
+
+Endpoints:
+1. POST /elderly/:elderlyId/health-records
+   - Permission: caregiver or admin
+   - Accept: bloodPressure, bloodSugar, heartRate, etc
+   - Save to database
+   - Return: {success: true, recordId}
+
+2. GET /elderly/:elderlyId/health-records
+   - Permission: elderly self, family, caregiver, admin
+   - Query parameters: ?startDate=2024-01-01&endDate=2024-12-31 (optional)
+   - Return: array of health records sorted by date (newest first)
+
+3. GET /elderly/:elderlyId/health-records/latest
+   - Return only most recent record for each type
+   - Useful for dashboard display
+
+4. PUT /health-records/:recordId
+   - Permission: caregiver who created it, admin
+   - Update any field
+
+5. DELETE /health-records/:recordId
+   - Permission: admin only (keep audit trail)
+   - Soft delete: mark as deleted, don't actually remove
+
+Include:
+- Input validation (blood pressure format, etc)
+- Middleware to verify permission
+- Proper error messages`,
+
+      emergencySos: `Create comprehensive emergency/SOS system:
+
+File: routes/emergency.js, models/Emergency.js
+
+Core Endpoints:
+
+1. POST /emergency/sos
+   Permission: elderly user only
+   Accept: {latitude, longitude, description (optional)}
+   Action:
+   - Create Emergency record with status: 'active'
+   - Get all family members linked to elderly
+   - Get all caregivers assigned to elderly
+   - For each, create notification record
+   - Trigger push notification (we'll implement notification sending separately)
+   - Return: {success: true, emergencyId, notificationsSent: count}
+   
+2. GET /emergency/:emergencyId
+   Permission: elderly (own), family/caregiver (assigned elderly), admin
+   Return: {emergencyId, status, location, description, notifiedContacts, triggeredAt}
+
+3. POST /emergency/:emergencyId/update-location
+   Permission: elderly user only
+   Accept: {latitude, longitude}
+   Action:
+   - Update Emergency record with new location
+   - Update locationUpdatedAt timestamp
+   - Trigger notification to family/caregiver (location updated)
+   - Return: {success: true}
+
+4. POST /emergency/:emergencyId/resolve
+   Permission: elderly, family, caregiver, admin
+   Accept: {resolution} (optional notes)
+   Action:
+   - Set status: 'resolved'
+   - Set resolvedAt: timestamp
+   - Notify all contacts that emergency resolved
+   - Return: {success: true}
+
+5. GET /emergency/active-for/:elderlyId
+   Permission: family/caregiver assigned to elderly, admin
+   Return: Current active emergency (if any)
+
+6. GET /emergency/history/:elderlyId?limit=10
+   Permission: elderly, family, caregiver, admin
+   Return: List of past emergencies (resolved or false_alarm)
+
+Important Logic:
+- SOS immediately persists to database (don't wait for notifications)
+- Location updates should be frequent (every 5-10 seconds)
+- One SOS at a time per elderly (can't have multiple active)
+- Old emergency auto-resolves after 24 hours if not manually resolved
+- Log every action (audit trail)
+
+Include error handling:
+- What if no contacts available? Still save emergency
+- What if location unavailable? Save with null location, ask app to retry
+- What if network down? App should retry posting`
+    };
+
+    function changePrompt(key) {
+      const display = document.getElementById('selected-prompt-content');
+      if (display && PROMPTS[key]) {
+        display.textContent = PROMPTS[key];
+        
+        // Remove active class from selector buttons
+        document.querySelectorAll('.prompt-selector-btn').forEach(btn => {
+          btn.classList.remove('active');
+        });
+        // Add to clicked button
+        event.currentTarget.classList.add('active');
+      }
+    }
+
+    // Local function to filter Endpoints list
+    function filterEndpoints() {
+      const q = document.getElementById('endpoint-search').value.toLowerCase();
+      const rows = document.querySelectorAll('#endpoint-table-body tr');
+      
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        if (text.includes(q)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+  </script>
+  <style>
+    .prompt-selector-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      margin-bottom: 0.5rem;
+    }
+    .prompt-selector-btn:hover {
+      background: rgba(255, 255, 255, 0.02);
+      color: white;
+    }
+    .prompt-selector-btn.active {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: var(--color-primary);
+      color: white;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">CP</div>
+        <div class="brand-name">
+          <h1>Care Platform</h1>
+          <p>Build Roadmap</p>
+        </div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a href="index.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Overview Dashboard
+          </a>
+        </li>
+        <li class="nav-item" data-phase="0">
+          <a href="phase0.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M6 6h10M6 10h10"/></svg>
+            Phase 0: Learning
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item active" data-phase="1">
+          <a href="phase1.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+            Phase 1: Backend
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="2">
+          <a href="phase2.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+            Phase 2: Android UI
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item" data-phase="3">
+          <a href="phase3.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Phase 3: Testing
+            <span class="phase-badge">0%</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="tools.html">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            Deployment & Tools
+          </a>
+        </li>
+      </nav>
+      
+      <div class="progress-card">
+        <div class="progress-header">
+          <span>Overall Progress</span>
+          <span class="progress-percentage">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">0 of 65 tasks completed</div>
+      </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="main-content animate-fade-in">
+      <header class="page-header">
+        <div class="page-title">
+          <h2>Phase 1: Backend Development</h2>
+          <p>Assemble the database infrastructure, core express controllers, and configure socket networks.</p>
+        </div>
+        <div class="meta-badges">
+          <div class="badge badge-info">Duration: Month 1 (Weeks 3-6)</div>
+          <div class="badge badge-accent">Goal: Active API Deployment</div>
+        </div>
+      </header>
+
+      <!-- Week-by-Week Accordion tabs -->
+      <section class="glass-card col-12 tabs-wrapper" style="margin-bottom: 3rem;">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+          Phase 1 Week-by-Week Execution
+        </h3>
+        
+        <div class="tabs-container">
+          <button class="tab-btn active" data-tab="p1-w1">Week 1: Setup & Auth</button>
+          <button class="tab-btn" data-tab="p1-w2">Week 2: Models & CRUD</button>
+          <button class="tab-btn" data-tab="p1-w3">Week 3-4: Emergency & Messages</button>
+          <button class="tab-btn" data-tab="p1-w4">Week 4: Reports & Admin</button>
+        </div>
+
+        <!-- Week 1 content -->
+        <div class="tab-pane active" data-tab-content="p1-w1">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p1-task1">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task1">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Install & Setup Express Project</span>
+                    <span class="task-desc">Initialize folder, run `npm init -y` and install: express, mongoose, bcryptjs, jsonwebtoken, cors, dotenv.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task2">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task2">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Set up MongoDB Atlas Cloud</span>
+                    <span class="task-desc">Create free Atlas cluster and obtain database URL `mongodb+srv://...` for env file.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task3">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task3">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Establish Directory Architecture</span>
+                    <span class="task-desc">Create standard folders: /models, /routes, /middleware, /controllers, and .env.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task4">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task4">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Write Server Connection Blueprint</span>
+                    <span class="task-desc">Implement `server.js` with express boilerplate, mongo connection string, and basic health checks.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task5">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task5">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Write Mongoose User Schema</span>
+                    <span class="task-desc">In `models/User.js`, write schema configuration with password hashing hooks.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task6">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task6">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Implement Auth Endpoints</span>
+                    <span class="task-desc">Code POST /register, POST /login (with JWT response) and POST /verify-token.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task7">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task7">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Verify Auth APIs in Postman</span>
+                    <span class="task-desc">Register test elderly, login, and confirm bearer tokens validates on private routes.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="col-4">
+              <div class="callout callout-info" style="margin: 0;">
+                <h4>Boilerplate dependencies</h4>
+                <p style="font-size: 0.85rem; margin-bottom: 0.5rem;">Run these npm packages during initial setup:</p>
+                <code style="display: block; font-family: var(--font-mono); font-size: 0.75rem; background: rgba(0,0,0,0.3); padding: 0.5rem; border-radius: 4px; color: var(--color-secondary);">npm install express mongoose bcryptjs jsonwebtoken cors dotenv</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 2 content -->
+        <div class="tab-pane" data-tab-content="p1-w2">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p1-task8">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task8">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Write Mongoose Models (Core Data)</span>
+                    <span class="task-desc">Create HealthRecord.js, Medication.js, MedicationLog.js, Appointment.js, Emergency.js, Message.js, and Activity.js schemas.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task9">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task9">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Create Role Middleware Validation</span>
+                    <span class="task-desc">Code `roleCheck.js` checking roles, verifying assignments (Caregiver ↔ Elderly) and validating access.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task10">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task10">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build HealthRecords CRUD routes</span>
+                    <span class="task-desc">Code POST health records (caregiver), GET records (sorted by date), and latest dashboard preview route.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task11">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task11">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Medications endpoints</span>
+                    <span class="task-desc">Write POST medication rules, GET Active meds list, and POST /mark-taken log triggers.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task12">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task12">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Appointments scheduling APIs</span>
+                    <span class="task-desc">Build POST appointment scheduler and GET scheduled queries with date validation constraints.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task13">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task13">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Family ↔ Caregiver Assignments links</span>
+                    <span class="task-desc">Build relational link schemas so Family and Caregivers map to target elderly profiles.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task14">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task14">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Audit Week 2 CRUD routes in Postman</span>
+                    <span class="task-desc">Perform unit tests to confirm 403 Forbidden responses block unrelated users.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="callout callout-warning" style="margin: 0;">
+                <h4>Relational Integrity</h4>
+                <p style="font-size: 0.85rem;">Mongoose references are critical. Always index reference keys (e.g. `{ elderlyUserId: 1 }`) to ensure dashboard load times under 2 seconds at scale.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 3-4 content -->
+        <div class="tab-pane" data-tab-content="p1-w3">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p1-task15">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task15">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Code POST /emergency/sos handler</span>
+                    <span class="task-desc">Insert active emergency, capture current GPS location, map links, and send push notifications.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task16">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task16">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Code POST /update-location GPS tracking</span>
+                    <span class="task-desc">Create continuous tracking route updating coordinates every 10 seconds.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task17">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task17">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Code POST /emergency/resolve resolver</span>
+                    <span class="task-desc">Mark active emergency as resolved, store resolution report notes, and notify all family members.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task18">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task18">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Create Messaging routes (Pagination)</span>
+                    <span class="task-desc">Code POST /send, GET conversation/:otherId with pagination support (limit & skip) and unread counts.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task19">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task19">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Create Activity logs tracker</span>
+                    <span class="task-desc">Build routes for registering walking duration, exercise logs, and average sleep metrics.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task20">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task20">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build notifications infrastructure</span>
+                    <span class="task-desc">Build routes for retrieving users' active notification logs and marking items as read.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="callout callout-danger" style="margin: 0;">
+                <h4>Emergency Priority</h4>
+                <p style="font-size: 0.85rem;">Persist SOS logs to MongoDB immediately before attempting to dispatch push notifications. An Atlas connection crash must not block the core emergency trace.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Week 4 content -->
+        <div class="tab-pane" data-tab-content="p1-w4">
+          <div style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 2rem;">
+            <div class="col-8">
+              <div class="task-list">
+                <label class="task-item" for="p1-task21">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task21">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Implement Doctor Booking system</span>
+                    <span class="task-desc">Create listings of doctors, schedules, checkups, and doctor-linked appointments.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task22">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task22">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Implement PDF/JSON Health Reports</span>
+                    <span class="task-desc">Generate monthly summaries of blood pressure, blood sugar trends, and medication adherence.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task23">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task23">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Build Admin Dashboard APIs</span>
+                    <span class="task-desc">Expose statistics endpoints (total active emergencies, caregiver ratios) and client suspension controls.</span>
+                  </div>
+                </label>
+                <label class="task-item" for="p1-task24">
+                  <div class="task-checkbox-container">
+                    <input type="checkbox" id="p1-task24">
+                    <span class="checkmark"></span>
+                  </div>
+                  <div class="task-content">
+                    <span class="task-title">Finalize API Documentation & Checklist</span>
+                    <span class="task-desc">Export Postman test collection, document settings, and ensure backend checklist is completed.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="mini-card">
+                <h4>Phase 1 Completion Checklist</h4>
+                <ul style="font-size: 0.8rem; padding-left: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                  <li>JWT Auth validates correctly</li>
+                  <li>Role-Based security verified</li>
+                  <li>SOS updates coordinates</li>
+                  <li>Endpoints tested in Postman</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Searchable API Reference Grid -->
+      <section class="glass-card col-12" style="margin-bottom: 3rem;">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-secondary);"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
+          API Endpoint Reference Directory
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          Quickly search or filter planned API endpoints. Use the search bar to locate routes.
+        </p>
+
+        <div class="search-container">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="endpoint-search" class="search-input" placeholder="Search by endpoint, method, or permissions (e.g. POST, elderly, caregiver)..." onkeyup="filterEndpoints()">
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Access Level</th>
+                <th>Functional Goal</th>
+              </tr>
+            </thead>
+            <tbody id="endpoint-table-body">
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/auth/register</td>
+                <td>Public</td>
+                <td>Register user (role: elderly, family, caregiver, admin)</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/auth/login</td>
+                <td>Public</td>
+                <td>Authenticate password, return token & user profile details</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #60A5FA; border-color: rgba(59, 130, 246, 0.2);">GET</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/elderly/:id/health-records</td>
+                <td>Linked Roles</td>
+                <td>Get chronological health logs list for dashboard trends</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/elderly/:id/health-records</td>
+                <td>Caregiver / Admin</td>
+                <td>Log new blood pressure, glucose, temperature, and mood metrics</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/emergency/sos</td>
+                <td>Elderly Only</td>
+                <td>Activate SOS status, log GPS, and trigger notification array</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/emergency/:id/update-location</td>
+                <td>Elderly Only</td>
+                <td>Track coordinate shifts during active emergency cycles</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(16, 185, 129, 0.1); color: #34D399; border-color: rgba(16, 185, 129, 0.2);">POST</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/messages/send</td>
+                <td>Linked Roles</td>
+                <td>Send real-time encrypted texts or GPS sharing alerts</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #60A5FA; border-color: rgba(59, 130, 246, 0.2);">GET</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/reports/health-summary/:elderlyId</td>
+                <td>Linked Roles</td>
+                <td>Compile monthly vitals and medical compliance charts</td>
+              </tr>
+              <tr>
+                <td><span class="badge" style="background: rgba(59, 130, 246, 0.1); color: #60A5FA; border-color: rgba(59, 130, 246, 0.2);">GET</span></td>
+                <td style="font-family: var(--font-mono); font-size: 0.85rem;">/admin/statistics</td>
+                <td>Admin Only</td>
+                <td>Retrieve total active emergencies and system node performance stats</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Interactive Claude Code Prompt Library -->
+      <section class="glass-card col-12">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+          Claude Prompt Library
+        </h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem;">
+          Select a prompt from the sidebar to populate the copy-box. Click copy to copy code triggers straight to Claude.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2rem;">
+          <!-- Selector Column -->
+          <div style="border-right: 1px solid var(--border-glass); padding-right: 1.5rem;">
+            <button class="prompt-selector-btn active" onclick="changePrompt('server')">Express Server Config</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('userModel')">User Database Model</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('authRoutes')">JWT Auth Controller</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('coreModels')">Vitals Data Models</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('middleware')">Role-Check Middleware</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('healthApis')">Health Vitals Endpoints</button>
+            <button class="prompt-selector-btn" onclick="changePrompt('emergencySos')">Emergency SOS Controller</button>
+          </div>
+
+          <!-- Output Box Column -->
+          <div class="prompt-box" style="margin: 0;">
+            <div class="prompt-header">
+              <span class="prompt-label" id="selected-prompt-title">Prompt Template</span>
+              <button class="copy-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                Copy Prompt
+              </button>
+            </div>
+            <pre class="prompt-content" id="selected-prompt-content">Create a basic Node.js Express server with:
+- MongoDB connection using Mongoose
+- CORS enabled
+- Environment variables (.env file)
+- PORT set to 5000
+- Basic route GET /health that returns {status: 'ok'}
+- Error handling middleware
+
+Structure:
+- Connect to MongoDB
+- Set up middleware
+- Create routes
+- Listen on PORT
+
+Show me server.js and .env.example</pre>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
