@@ -319,6 +319,40 @@ document.addEventListener('DOMContentLoaded', () => {
   initBackgroundParallax();
   initOnboarding();
   
+  // Interactive Coordinate Inspector Tracker
+  const coordDisplay = document.getElementById('coord-display');
+  const scrollArea = document.getElementById('map-scroll-area');
+  if (scrollArea && coordDisplay) {
+    scrollArea.addEventListener('mousemove', (e) => {
+      const rect = scrollArea.getBoundingClientRect();
+      const x = Math.round(e.clientX - rect.left + scrollArea.scrollLeft);
+      const y = Math.round(e.clientY - rect.top + scrollArea.scrollTop);
+      coordDisplay.textContent = `LOC // X:${x} Y:${y}`;
+    });
+  }
+
+  // Interactive Legend Highlight Event Listeners
+  const legendItems = document.querySelectorAll('.legend-item');
+  const tracksGrid = document.querySelector('.tracks-grid');
+  if (legendItems && tracksGrid) {
+    legendItems.forEach(item => {
+      item.addEventListener('mouseenter', () => {
+        const text = item.textContent.trim().toLowerCase();
+        if (text.includes('spine') || text.includes('core')) {
+          tracksGrid.classList.add('highlight-spine');
+        } else if (text.includes('mobile')) {
+          tracksGrid.classList.add('highlight-mobile');
+        } else if (text.includes('backend')) {
+          tracksGrid.classList.add('highlight-backend');
+        }
+      });
+      
+      item.addEventListener('mouseleave', () => {
+        tracksGrid.className = 'tracks-grid';
+      });
+    });
+  }
+  
   // Auto-inspect the active wayfinding target by default on load
   const activeTargetId = getYouAreHereNodeId();
   const activeShortId = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === activeTargetId);
@@ -736,29 +770,53 @@ function bindControls() {
   
   completeBtn.addEventListener('click', () => {
     if (!completedNodes.includes(selectedNodeId)) {
-      lastCompletedNodeId = selectedNodeId;
-      completedNodes.push(selectedNodeId);
-      saveProgress();
-      
-      // Spawn tactile particle burst
-      triggerSuccessParticles(selectedNodeId);
-      
-      // Redraw map connections and floating flag
-      updateMapUI();
-      drawConnections();
-      updateYouAreHereFlag();
-      
-      // Slide detail view to next target automatically
-      setTimeout(() => {
-        const nextActiveId = getYouAreHereNodeId();
-        const nextShortId = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === nextActiveId);
-        inspectNode(nextShortId || '1');
-        scrollActiveNodeIntoView(nextActiveId, false); // Auto center next active node
-      }, 750);
+      runTerminalBuildSimulation(selectedNodeId, () => {
+        lastCompletedNodeId = selectedNodeId;
+        completedNodes.push(selectedNodeId);
+        saveProgress();
+        
+        // Spawn tactile particle burst
+        triggerSuccessParticles(selectedNodeId);
+        
+        // Redraw map connections and floating flag
+        updateMapUI();
+        drawConnections();
+        updateYouAreHereFlag();
+        
+        // Slide detail view to next target automatically
+        setTimeout(() => {
+          const nextActiveId = getYouAreHereNodeId();
+          const nextShortId = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === nextActiveId);
+          inspectNode(nextShortId || '1');
+          scrollActiveNodeIntoView(nextActiveId, false); // Auto center next active node
+        }, 750);
+      });
     }
   });
   
   revertBtn.addEventListener('click', () => {
+    const consoleBody = document.getElementById('console-body');
+    if (consoleBody) {
+      consoleBody.innerHTML = '';
+      const line1 = document.createElement('div');
+      line1.className = 'console-line command';
+      line1.textContent = `$ git reset --hard HEAD~1`;
+      consoleBody.appendChild(line1);
+      
+      const line2 = document.createElement('div');
+      line2.className = 'console-line system';
+      line2.textContent = `Rolling back module integrations...`;
+      consoleBody.appendChild(line2);
+      
+      setTimeout(() => {
+        const line3 = document.createElement('div');
+        line3.className = 'console-line success';
+        line3.textContent = `HEAD is now at previous target commit.`;
+        consoleBody.appendChild(line3);
+        consoleBody.scrollTop = consoleBody.scrollHeight;
+      }, 300);
+    }
+
     completedNodes = completedNodes.filter(id => id !== selectedNodeId);
     
     // Lock cascading nodes
@@ -785,6 +843,72 @@ function bindControls() {
     inspectNode(shortId);
     scrollActiveNodeIntoView(selectedNodeId, false);
   });
+}
+
+// Gradle compile build simulation
+function runTerminalBuildSimulation(nodeId, callback) {
+  const consoleBox = document.getElementById('console-box');
+  const consoleBody = document.getElementById('console-body');
+  const completeBtn = document.getElementById('complete-btn');
+  
+  if (!consoleBox || !consoleBody) {
+    callback();
+    return;
+  }
+  
+  // Disable button during compile simulation
+  completeBtn.disabled = true;
+  consoleBox.classList.add('building');
+  
+  // Find node name
+  const nodeKey = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === nodeId);
+  const data = NODES_DATA[nodeKey];
+  const stageName = data.number;
+  
+  const logs = [
+    { text: `$ ./gradlew compile:${stageName}`, type: 'command' },
+    { text: `[gradle] Executing tasks: [:${stageName}:assembleDebug]`, type: 'system' },
+    { text: `[compiler] compiling ${data.tech || 'Kotlin sources'}...`, type: 'compile' },
+    { text: `[compiler] processing layout assets and resources`, type: 'compile' },
+    { text: `[testing] running unit tests for ${stageName}...`, type: 'compile' },
+    { text: `[gradle] BUILD SUCCESSFUL in 890ms`, type: 'success' },
+    { text: `[git] staging changes...`, type: 'system' },
+    { text: `[git] commit -m "module ${stageName} integrated successfully"`, type: 'command' },
+    { text: `[system] target commit successful.`, type: 'success' }
+  ];
+  
+  consoleBody.innerHTML = '';
+  let index = 0;
+  
+  function printNextLine() {
+    if (index < logs.length) {
+      const log = logs[index];
+      const line = document.createElement('div');
+      line.className = `console-line ${log.type}`;
+      line.textContent = log.text;
+      consoleBody.appendChild(line);
+      consoleBody.scrollTop = consoleBody.scrollHeight;
+      
+      // Update compiler progress bar live as compile steps run
+      const completedCount = completedNodes.length; 
+      const interimCount = completedCount + (index / logs.length);
+      const interimPct = (interimCount / 16) * 100;
+      
+      const progressFillEl = document.getElementById('custom-progress-fill');
+      if (progressFillEl) progressFillEl.style.width = `${interimPct}%`;
+      const pctTextEl = document.getElementById('terminal-percentage');
+      if (pctTextEl) pctTextEl.textContent = `${interimPct.toFixed(1)}%`;
+      
+      index++;
+      setTimeout(printNextLine, 90);
+    } else {
+      consoleBox.classList.remove('building');
+      completeBtn.disabled = false;
+      callback();
+    }
+  }
+  
+  printNextLine();
 }
 
 // Confetti burst success particles

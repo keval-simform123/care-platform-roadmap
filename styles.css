@@ -1237,3 +1237,182 @@ a:focus-visible {
     stroke-dashoffset: 0 !important;
   }
 }
+
+/* -------------------------------------------------------------
+ * Additional Interactive Elements & Polishes
+ * ------------------------------------------------------------- */
+
+/* Floating Coordinate Inspector */
+.coordinate-display {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  opacity: 0.45;
+  background: rgba(247, 245, 240, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid var(--color-stone);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 15;
+  letter-spacing: 0.05em;
+  transition: opacity 0.25s ease;
+}
+
+/* Interactive Legend Highlight States */
+.map-legend {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+  pointer-events: auto;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+  opacity: 0.8;
+  transition: opacity 0.25s var(--transition-bezier), transform 0.25s var(--transition-bezier);
+}
+
+.legend-item:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.map-legend:hover .legend-item:not(:hover) {
+  opacity: 0.35;
+}
+
+.tracks-grid {
+  transition: opacity 0.35s ease, filter 0.35s ease;
+}
+
+/* Highlight filters on column nodes */
+.tracks-grid.highlight-spine .map-node:not(.node-foundation):not(.node-deployment) {
+  opacity: 0.15 !important;
+  filter: grayscale(1) blur(0.6px) !important;
+}
+.tracks-grid.highlight-spine .wobbly-connector:not([stroke="#2B6E5C"]) {
+  opacity: 0.1 !important;
+}
+
+.tracks-grid.highlight-mobile .map-node:not(.node-mobile) {
+  opacity: 0.15 !important;
+  filter: grayscale(1) blur(0.6px) !important;
+}
+.tracks-grid.highlight-mobile .wobbly-connector:not([stroke="#8B5A6B"]) {
+  opacity: 0.1 !important;
+}
+
+.tracks-grid.highlight-backend .map-node:not(.node-backend) {
+  opacity: 0.15 !important;
+  filter: grayscale(1) blur(0.6px) !important;
+}
+.tracks-grid.highlight-backend .wobbly-connector:not([stroke="#2B6E5C"]) {
+  opacity: 0.1 !important;
+}
+
+/* Interactive Gradle Console Box */
+.console-box {
+  margin-top: 1.25rem;
+  background: #0E1315;
+  border: 1.5px solid var(--color-stone);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  will-change: transform, opacity;
+}
+
+.console-box.building {
+  border-color: var(--color-pine);
+  box-shadow: 0 4px 18px rgba(43, 110, 92, 0.25);
+}
+
+.console-header {
+  background: #171E21;
+  padding: 0.4rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.console-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  opacity: 0.75;
+}
+.console-dot.red { background: #FF5F56; }
+.console-dot.yellow { background: #FFBD2E; }
+.console-dot.green { background: #27C93F; }
+
+.console-title {
+  color: #A0A5A8;
+  font-size: 0.58rem;
+  font-weight: 700;
+  margin-left: 0.25rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.console-body {
+  padding: 0.75rem;
+  height: 110px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  scroll-behavior: smooth;
+}
+
+/* Scrollbar styling for console */
+.console-body::-webkit-scrollbar {
+  width: 4px;
+}
+.console-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.console-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.console-line {
+  font-size: 0.62rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.console-line.command {
+  color: #E2E8F0;
+}
+
+.console-line.system {
+  color: #718096;
+}
+
+.console-line.compile {
+  color: #A0AEC0;
+}
+
+.console-line.success {
+  color: #48BB78;
+  font-weight: 700;
+}
+
+.console-line.error {
+  color: #F56565;
+  font-weight: 700;
+}
