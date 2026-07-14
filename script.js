@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCustomCursor();
   initBackgroundParallax();
   initOnboarding();
+  initGlassHighlights();
   
   // Interactive Coordinate Inspector Tracker
   const coordDisplay = document.getElementById('coord-display');
@@ -1025,6 +1026,8 @@ function updateMapUI() {
     // Apply state-appropriate classes
     if (isCompleted) {
       nodeEl.classList.add('completed');
+      nodeEl.classList.add('glass-element');
+      nodeEl.classList.add('glass-tint-node');
       completedCount++;
     } else if (data.id === currentActiveId) {
       if (data.id.startsWith('node-m')) {
@@ -1034,8 +1037,12 @@ function updateMapUI() {
       } else {
         nodeEl.classList.add('active-spine');
       }
+      nodeEl.classList.add('glass-element');
+      nodeEl.classList.add('glass-tint-node');
     } else if (isUnlocked) {
       nodeEl.classList.add('available');
+      nodeEl.classList.add('glass-element');
+      nodeEl.classList.add('glass-tint-node');
     } else {
       nodeEl.classList.add('locked');
     }
@@ -1264,4 +1271,63 @@ function getWobblyPath(x1, y1, x2, y2) {
   }
   d += ` L ${x2} ${y2}`;
   return d;
+}
+
+// Apple visionOS Liquid Glass Dynamic Highlights and Click Flashes
+function initGlassHighlights() {
+  if (prefersReducedMotion) return;
+  
+  // Throttle variable mousemove sheen updates
+  document.addEventListener('mousemove', (e) => {
+    const target = e.target.closest('.glass-element');
+    if (!target) return;
+    
+    const rect = target.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    
+    if (typeof gsap !== 'undefined') {
+      gsap.to(target, {
+        '--sheen-x': `${xPct}%`,
+        '--sheen-y': `${yPct}%`,
+        duration: 0.45,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    } else {
+      target.style.setProperty('--sheen-x', `${xPct}%`);
+      target.style.setProperty('--sheen-y', `${yPct}%`);
+    }
+  });
+
+  // Reset sheen position on mouse leave
+  document.addEventListener('mouseleave', (e) => {
+    const target = e.target.closest('.glass-element');
+    if (!target) return;
+    
+    if (typeof gsap !== 'undefined') {
+      gsap.to(target, {
+        '--sheen-x': '50%',
+        '--sheen-y': '50%',
+        duration: 0.8,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    } else {
+      target.style.setProperty('--sheen-x', '50%');
+      target.style.setProperty('--sheen-y', '50%');
+    }
+  }, true);
+
+  // Subtle premium click flash / ripple effect from click point
+  document.addEventListener('mousedown', (e) => {
+    const target = e.target.closest('.glass-element');
+    if (!target) return;
+    
+    target.classList.add('glass-click-flash');
+    
+    setTimeout(() => {
+      target.classList.remove('glass-click-flash');
+    }, 250);
+  });
 }
