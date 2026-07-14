@@ -330,11 +330,42 @@ document.addEventListener('DOMContentLoaded', () => {
     updateYouAreHereFlag();
   }, 100);
 
+  // Auto-scroll to center the active node in the viewport on load
+  setTimeout(() => {
+    scrollActiveNodeIntoView(activeTargetId, true);
+  }, 300);
+
   window.addEventListener('resize', () => {
     drawConnections();
     updateYouAreHereFlag();
   });
 });
+
+// Smoothly scroll active node into the center of viewport
+function scrollActiveNodeIntoView(nodeId, immediate = false) {
+  const activeNodeEl = document.getElementById(nodeId);
+  const scrollArea = document.getElementById('map-scroll-area');
+  if (!activeNodeEl || !scrollArea) return;
+  
+  // Calculate relative top scroll offset
+  const scrollTop = activeNodeEl.offsetTop - (scrollArea.clientHeight / 2) + (activeNodeEl.clientHeight / 2);
+  const targetScroll = Math.max(0, scrollTop);
+  
+  if (immediate || prefersReducedMotion) {
+    scrollArea.scrollTop = targetScroll;
+  } else {
+    if (typeof gsap !== 'undefined') {
+      gsap.to(scrollArea, {
+        scrollTop: targetScroll,
+        duration: 1.1,
+        ease: "power2.inOut",
+        overwrite: "auto"
+      });
+    } else {
+      scrollArea.scrollTop = targetScroll;
+    }
+  }
+}
 
 // Load state from localStorage
 function loadProgress() {
@@ -398,7 +429,12 @@ function initOnboarding() {
         marginBottom: 0,
         duration: 0.5,
         ease: "power2.inOut",
-        onComplete: () => callout.remove()
+        onComplete: () => {
+          callout.remove();
+          // Re-scroll active node post layout shifts
+          const activeTargetId = getYouAreHereNodeId();
+          scrollActiveNodeIntoView(activeTargetId, false);
+        }
       });
     } else {
       callout.remove();
@@ -717,6 +753,7 @@ function bindControls() {
         const nextActiveId = getYouAreHereNodeId();
         const nextShortId = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === nextActiveId);
         inspectNode(nextShortId || '1');
+        scrollActiveNodeIntoView(nextActiveId, false); // Auto center next active node
       }, 750);
     }
   });
@@ -746,6 +783,7 @@ function bindControls() {
     
     const shortId = Object.keys(NODES_DATA).find(k => NODES_DATA[k].id === selectedNodeId);
     inspectNode(shortId);
+    scrollActiveNodeIntoView(selectedNodeId, false);
   });
 }
 
@@ -811,7 +849,7 @@ function updateMapUI() {
       colMobile.classList.remove('inactive-branch');
       if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
         gsap.fromTo(colMobile, 
-          { opacity: 0.28, filter: "grayscale(0.9) blur(0.3px)" }, 
+          { opacity: 0.35, filter: "grayscale(0.8) blur(0.2px)" }, 
           { opacity: 1, filter: "grayscale(0) blur(0px)", duration: 0.85, ease: "power2.out" }
         );
       }
@@ -820,7 +858,7 @@ function updateMapUI() {
       colBackend.classList.remove('inactive-branch');
       if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
         gsap.fromTo(colBackend, 
-          { opacity: 0.28, filter: "grayscale(0.9) blur(0.3px)" }, 
+          { opacity: 0.35, filter: "grayscale(0.8) blur(0.2px)" }, 
           { opacity: 1, filter: "grayscale(0) blur(0px)", duration: 0.85, ease: "power2.out" }
         );
       }
@@ -916,7 +954,7 @@ function getYouAreHereNodeId() {
   return 'node-t4';
 }
 
-// Reposition floating flag and live mini-map dot
+// Reposition floating flag
 function updateYouAreHereFlag() {
   const activeId = getYouAreHereNodeId();
   const targetNode = document.getElementById(activeId);
