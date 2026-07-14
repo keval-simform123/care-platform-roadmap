@@ -489,12 +489,15 @@ function initCustomCursor() {
   
   if (!cursor || !ring || !dot) return;
   
+  let magneticCenterX = 0;
+  let magneticCenterY = 0;
+  
   document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
   });
   
-  // Custom cursor tracking frame loops (ensures no events conflicts override magnetic pulls)
+  // Custom cursor tracking frame loops (uses cached coordinates to prevent layout thrashing/reflow)
   function updateCursorFrame() {
     let targetRingX = mouseX;
     let targetRingY = mouseY;
@@ -502,18 +505,14 @@ function initCustomCursor() {
     let targetDotY = mouseY;
 
     if (activeMagneticNode && !prefersReducedMotion) {
-      const rect = activeMagneticNode.getBoundingClientRect();
-      const nodeCenterX = rect.left + rect.width / 2;
-      const nodeCenterY = rect.top + rect.height / 2;
-      
-      const distX = mouseX - nodeCenterX;
-      const distY = mouseY - nodeCenterY;
+      const distX = mouseX - magneticCenterX;
+      const distY = mouseY - magneticCenterY;
       const distance = Math.hypot(distX, distY);
       
       if (distance < 75) {
         // Pull cursor ring slightly towards node center
-        targetRingX = mouseX + (nodeCenterX - mouseX) * 0.45;
-        targetRingY = mouseY + (nodeCenterY - mouseY) * 0.45;
+        targetRingX = mouseX + (magneticCenterX - mouseX) * 0.45;
+        targetRingY = mouseY + (magneticCenterY - mouseY) * 0.45;
         
         // Pull node slightly towards mouse coordinates (Uses CSS custom properties to prevent diamond rotate overrides)
         const nodePullX = distX * 0.22;
@@ -530,12 +529,12 @@ function initCustomCursor() {
       }
     }
 
-    // Lerp coordinates
-    ringX += (targetRingX - ringX) * 0.16;
-    ringY += (targetRingY - ringY) * 0.16;
+    // Snappier lerp tracking settings (reduced lag)
+    ringX += (targetRingX - ringX) * 0.25;
+    ringY += (targetRingY - ringY) * 0.25;
     
-    dotX += (targetDotX - dotX) * 0.45;
-    dotY += (targetDotY - dotY) * 0.45;
+    dotX += (targetDotX - dotX) * 0.65;
+    dotY += (targetDotY - dotY) * 0.65;
 
     // Apply translations using template offset transformations
     ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
@@ -551,6 +550,10 @@ function initCustomCursor() {
       const isLocked = node.classList.contains('locked');
       const isCompleted = node.classList.contains('completed');
       
+      // Cache coordinates once on enter to prevent layout recalculation inside loop
+      const rect = node.getBoundingClientRect();
+      magneticCenterX = rect.left + rect.width / 2;
+      magneticCenterY = rect.top + rect.height / 2;
       activeMagneticNode = node; // Register active magnetic target
       
       if (isLocked) {
