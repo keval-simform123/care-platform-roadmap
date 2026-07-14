@@ -347,13 +347,20 @@ a:focus-visible {
 }
 
 /* Narrowed Canvas Layout to reduce dead side spaces */
+/* Progressive Canvas Layout: collapses Mobile/Backend before Stage 04 */
 .tracks-grid {
   display: grid;
-  grid-template-columns: 1fr 140px 1fr; /* Narrower columns gap spacing */
+  grid-template-columns: 110px 1fr 110px; /* Collapsed state */
   width: 100%;
-  max-width: 780px; /* Reduced from 1100px to sit closer together */
+  max-width: 760px; /* Highly constrained to remove empty space */
   margin: 0 auto;
   position: relative;
+  transition: grid-template-columns 0.8s var(--transition-bezier), max-width 0.8s var(--transition-bezier);
+}
+
+.tracks-grid.layout-expanded {
+  grid-template-columns: 1fr 1.05fr 1fr; /* Smoothly expands to equal thirds + slightly wider core */
+  max-width: 880px;
 }
 
 .track-col {
@@ -361,7 +368,29 @@ a:focus-visible {
   flex-direction: column;
   align-items: center;
   position: relative;
-  transition: opacity 0.8s var(--transition-bezier), filter 0.8s var(--transition-bezier);
+  transition: opacity 0.8s var(--transition-bezier), filter 0.8s var(--transition-bezier), transform 0.8s var(--transition-bezier);
+  overflow: hidden; /* Hide overflowing elements when collapsed */
+}
+
+/* Collapsed Column Visual Preview Strips */
+.tracks-grid:not(.layout-expanded) .track-mobile-col,
+.tracks-grid:not(.layout-expanded) .track-backend-col {
+  opacity: 0.18;
+  filter: grayscale(1) blur(0.4px);
+}
+
+.tracks-grid:not(.layout-expanded) .track-mobile-col .column-header h3,
+.tracks-grid:not(.layout-expanded) .track-backend-col .column-header h3 {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.tracks-grid:not(.layout-expanded) .track-mobile-col .node-label,
+.tracks-grid:not(.layout-expanded) .track-backend-col .node-label {
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
 }
 
 /* Dim Inactive Branch Columns */
@@ -377,9 +406,16 @@ a:focus-visible {
 
 .column-header h3 {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.15rem; /* Slightly smaller to fit tighter columns */
   font-weight: 700;
   line-height: 1.3;
+  margin: 0.25rem 0 0 0;
+  color: var(--color-ink);
+  transition: opacity 0.6s var(--transition-bezier), transform 0.6s var(--transition-bezier);
+}
+
+.track-col .node-label {
+  transition: opacity 0.6s var(--transition-bezier), transform 0.6s var(--transition-bezier);
 }
 
 /* Custom spine labels - Hand-drawn Marginalia style */

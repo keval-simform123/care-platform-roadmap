@@ -130,15 +130,15 @@
             <div class="node-wrapper ghost-node-wrapper" style="margin-top: 4rem;">
               <div class="ghost-node" style="width: 44px; height: 44px;"></div>
             </div>
-            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 6rem;">
               <div class="ghost-node" style="width: 58px; height: 58px;"></div>
             </div>
-            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 6rem;">
               <div class="ghost-node" style="width: 58px; height: 58px;"></div>
             </div>
             
             <!-- Node M1 (Compose) -->
-            <div class="node-wrapper" style="margin-top: 18rem;">
+            <div class="node-wrapper" style="margin-top: 14rem;">
               <button class="map-node node-mobile" id="node-m1" data-id="m1" data-weight="Medium (8h)" data-title="Build an interactive Compose screen" data-tech="Jetpack Compose" data-prereq="node-4">
                 <span class="node-inner">cmp</span>
                 <div class="lock-badge">
@@ -152,7 +152,7 @@
             </div>
             
             <!-- Node M2 (ViewModel) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-mobile" id="node-m2" data-id="m2" data-weight="Large (16h)" data-title="Manage state with ViewModel" data-tech="ViewModel & LiveData" data-prereq="node-m1">
                 <span class="node-inner">vm</span>
                 <div class="lock-badge">
@@ -166,7 +166,7 @@
             </div>
             
             <!-- Node M3 (Room) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-mobile" id="node-m3" data-id="m3" data-weight="Large (20h)" data-title="Persist records locally in Room" data-tech="Room & SQLite" data-prereq="node-m2">
                 <span class="node-inner">db</span>
                 <div class="lock-badge">
@@ -180,7 +180,7 @@
             </div>
             
             <!-- Node M4 (WorkManager) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-mobile" id="node-m4" data-id="m4" data-weight="Medium (10h)" data-title="Schedule tasks with WorkManager" data-tech="WorkManager API" data-prereq="node-m3">
                 <span class="node-inner">bg</span>
                 <div class="lock-badge">
@@ -216,7 +216,7 @@
             </div>
             
             <!-- Node 2 (Kotlin Script) -->
-            <div class="node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper" style="margin-top: 6rem;">
               <button class="map-node node-foundation" id="node-2" data-id="2" data-weight="Medium (6h)" data-title="Write your first Kotlin script" data-tech="Kotlin Basics" data-prereq="node-1">
                 <span class="node-inner">kt</span>
                 <div class="lock-badge">
@@ -230,7 +230,7 @@
             </div>
             
             <!-- Node 3 (XML) -->
-            <div class="node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper" style="margin-top: 6rem;">
               <button class="map-node node-foundation" id="node-3" data-id="3" data-weight="Medium (8h)" data-title="Build a layout with XML" data-tech="XML & Views" data-prereq="node-2">
                 <span class="node-inner">xml</span>
                 <div class="lock-badge">
@@ -244,7 +244,7 @@
             </div>
             
             <!-- Node 4 (Fetch API - Decision Point Node Junction) -->
-            <div class="node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper" style="margin-top: 6rem;">
               <button class="map-node node-foundation node-junction" id="node-4" data-id="4" data-weight="Large (12h)" data-title="Fetch JSON data from an API" data-tech="HttpURLConnection & JSON" data-prereq="node-3">
                 <span class="node-inner">json</span>
                 <div class="lock-badge">
@@ -259,7 +259,7 @@
             </div>
             
             <!-- Center spine node merges back at integration -->
-            <div class="node-wrapper" style="margin-top: 50rem;">
+            <div class="node-wrapper" style="margin-top: 40rem;">
               <div class="junction-indicator merge-indicator">pathway merge</div>
               <button class="map-node node-deployment" id="node-t1" data-id="t1" data-weight="Large (16h)" data-title="Write integration tests" data-tech="Playwright & Postman" data-prereq="node-m4,node-b4">
                 <span class="node-inner">test</span>
@@ -274,7 +274,7 @@
             </div>
             
             <!-- Node T2 (Security) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-deployment" id="node-t2" data-id="t2" data-weight="Small (4h)" data-title="Audit API security headers" data-tech="Helmet & CORS Settings" data-prereq="node-t1">
                 <span class="node-inner">sec</span>
                 <div class="lock-badge">
@@ -288,7 +288,7 @@
             </div>
             
             <!-- Node T3 (Deploy API) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-deployment" id="node-t3" data-id="t3" data-weight="Medium (8h)" data-title="Deploy code to a cloud server" data-tech="DigitalOcean & Let's Encrypt" data-prereq="node-t2">
                 <span class="node-inner">srv</span>
                 <div class="lock-badge">
@@ -302,7 +302,7 @@
             </div>
             
             <!-- Node T4 (Play Store) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-deployment" id="node-t4" data-id="t4" data-weight="Large (14h)" data-title="Submit signed bundle to Play Store" data-tech="Google Play Console" data-prereq="node-t3">
                 <span class="node-inner">pub</span>
                 <div class="lock-badge">
@@ -327,15 +327,15 @@
             <div class="node-wrapper ghost-node-wrapper" style="margin-top: 4rem;">
               <div class="ghost-node" style="width: 44px; height: 44px;"></div>
             </div>
-            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 6rem;">
               <div class="ghost-node" style="width: 58px; height: 58px;"></div>
             </div>
-            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 8rem;">
+            <div class="node-wrapper ghost-node-wrapper" style="margin-top: 6rem;">
               <div class="ghost-node" style="width: 58px; height: 58px;"></div>
             </div>
             
             <!-- Node B1 (Express Setup) -->
-            <div class="node-wrapper" style="margin-top: 18rem;">
+            <div class="node-wrapper" style="margin-top: 14rem;">
               <button class="map-node node-backend" id="node-b1" data-id="b1" data-weight="Medium (10h)" data-title="Serve API routes with Express" data-tech="Node.js & Express" data-prereq="node-4">
                 <span class="node-inner">api</span>
                 <div class="lock-badge">
@@ -349,7 +349,7 @@
             </div>
             
             <!-- Node B2 (MongoDB) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-backend" id="node-b2" data-id="b2" data-weight="Medium (12h)" data-title="Connect routes to MongoDB" data-tech="Mongoose & MongoDB Atlas" data-prereq="node-b1">
                 <span class="node-inner">db</span>
                 <div class="lock-badge">
@@ -363,7 +363,7 @@
             </div>
             
             <!-- Node B3 (JWT Auth) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-backend" id="node-b3" data-id="b3" data-weight="Large (18h)" data-title="Encrypt passwords and sign JWTs" data-tech="Bcrypt & JWT Session" data-prereq="node-b2">
                 <span class="node-inner">jwt</span>
                 <div class="lock-badge">
@@ -377,7 +377,7 @@
             </div>
             
             <!-- Node B4 (Socket.io) -->
-            <div class="node-wrapper" style="margin-top: 10rem;">
+            <div class="node-wrapper" style="margin-top: 8rem;">
               <button class="map-node node-backend" id="node-b4" data-id="b4" data-weight="Large (16h)" data-title="Stream live data using Socket.io" data-tech="WebSockets & Socket.io" data-prereq="node-b3">
                 <span class="node-inner">ws</span>
                 <div class="lock-badge">

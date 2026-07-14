@@ -960,6 +960,23 @@ function triggerSuccessParticles(nodeId) {
   }
 }
 
+// Triggers connection line updates continuously during layout transitions to prevent visual offset detachment
+function animateLayoutTransition() {
+  const duration = 800; // matching CSS transition duration
+  const start = performance.now();
+  
+  function step(now) {
+    drawConnections();
+    if (now - start < duration) {
+      requestAnimationFrame(step);
+    } else {
+      drawConnections(); // final call to lock in exact positions
+      updateYouAreHereFlag(); // re-align floating flag
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 // Update Map class mappings based on complete/active/available/locked states
 function updateMapUI() {
   let completedCount = 0;
@@ -971,8 +988,13 @@ function updateMapUI() {
   const isStage4Complete = completedNodes.includes('node-4');
   const colMobile = document.getElementById('col-mobile');
   const colBackend = document.getElementById('col-backend');
+  const tracksGrid = document.querySelector('.tracks-grid');
   
   if (isStage4Complete) {
+    if (tracksGrid && !tracksGrid.classList.contains('layout-expanded')) {
+      tracksGrid.classList.add('layout-expanded');
+      animateLayoutTransition();
+    }
     if (colMobile && colMobile.classList.contains('inactive-branch')) {
       colMobile.classList.remove('inactive-branch');
       if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
@@ -992,6 +1014,10 @@ function updateMapUI() {
       }
     }
   } else {
+    if (tracksGrid && tracksGrid.classList.contains('layout-expanded')) {
+      tracksGrid.classList.remove('layout-expanded');
+      animateLayoutTransition();
+    }
     colMobile?.classList.add('inactive-branch');
     colBackend?.classList.add('inactive-branch');
   }
@@ -1222,10 +1248,60 @@ function drawConnections() {
         }
       }
     }
+    
+    // 3. Draw Inline Duration Tag at midpoint of the path to fill vertical rhythm purposefully
+    const targetWeight = toEl.getAttribute('data-weight');
+    const match = targetWeight ? targetWeight.match(/\(([^)]+)\)/) : null;
+    const duration = match ? match[1] : '';
+    
+    if (duration) {
+      const badgeG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      badgeG.setAttribute('class', 'connector-badge-group');
+      
+      const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      rect.setAttribute('rx', '4');
+      rect.setAttribute('ry', '4');
+      rect.setAttribute('fill', '#FCFAF5');
+      
+      // Determine stroke based on traversability/completion
+      const badgeStroke = isFromCompleted ? (conn.track === 'spine' ? COLOR_PINE : COLOR_PLUM) : COLOR_STONE;
+      rect.setAttribute('stroke', badgeStroke);
+      rect.setAttribute('stroke-width', '1.2');
+      
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.textContent = duration;
+      text.setAttribute('font-family', '"Space Mono", monospace');
+      text.setAttribute('font-size', '8.5px');
+      text.setAttribute('font-weight', '700');
+      text.setAttribute('fill', isFromCompleted ? '#12181B' : 'rgba(18, 24, 27, 0.45)');
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      
+      badgeG.appendChild(rect);
+      badgeG.appendChild(text);
+      g.appendChild(badgeG);
+      
+      // Compute width and height based on character length
+      const paddingX = 6;
+      const paddingY = 3.5;
+      const textWidth = duration.length * 5.8; 
+      const textHeight = 10;
+      const w = textWidth + paddingX * 2;
+      const h = textHeight + paddingY * 2;
+      
+      // Compute midpoint coordinates
+      const mx = (x1 + x2) / 2;
+      const my = (y1 + y2) / 2;
+      
+      rect.setAttribute('x', mx - w / 2);
+      rect.setAttribute('y', my - h / 2);
+      rect.setAttribute('width', w);
+      rect.setAttribute('height', h);
+      
+      text.setAttribute('x', mx);
+      text.setAttribute('y', my + 0.5);
+    }
   });
-  
-  // Refresh UI states
-  updateMapUI();
 }
 
 // Wobbly route points generator
