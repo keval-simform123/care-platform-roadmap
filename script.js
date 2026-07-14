@@ -1292,7 +1292,7 @@ function initBackgroundParticles() {
   resizeObserver.observe(scrollArea);
   
   let particles = [];
-  const symbols = ['{', '}', '[', ']', '<', '>', '0', '1', '+', '-', 'x', 'y', 'db', 'api', 'ws', 'git', 'kt', 'xml'];
+  const symbols = ['{', '}', '<', '>', '/', ';', '()', '[]', '=>', '++', '&&', '||', '!=', '=='];
   const colors = ['#2B6E5C', '#8B5A6B', '#D4A85A', '#C7C2B8'];
   
   // Track last spawn position to limit rate
@@ -1304,9 +1304,9 @@ function initBackgroundParticles() {
     const x = e.clientX - rect.left + scrollArea.scrollLeft;
     const y = e.clientY - rect.top + scrollArea.scrollTop;
     
-    // Check distance moved to prevent spawning too many particles
+    // Increased distance threshold to make spawning subtle and sparse
     const dist = Math.hypot(x - lastX, y - lastY);
-    if (dist > 8) {
+    if (dist > 26) {
       spawnParticle(x, y);
       lastX = x;
       lastY = y;
@@ -1323,24 +1323,23 @@ function initBackgroundParticles() {
   }, { passive: true });
   
   function spawnParticle(x, y) {
-    const isChar = Math.random() > 0.45;
     particles.push({
       x: x,
       y: y,
-      vx: (Math.random() - 0.5) * 2.0,
-      vy: (Math.random() - 0.5) * 2.0 - 0.5, // upward float drift
-      alpha: 0.9,
-      decay: Math.random() * 0.01 + 0.006,
-      scale: Math.random() * 0.7 + 0.6,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: (Math.random() - 0.5) * 1.2 - 0.3, // slow gentle drift
+      alpha: 0.85,
+      decay: Math.random() * 0.02 + 0.016, // faster fade to keep it clean
+      scale: Math.random() * 0.5 + 0.5,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.05,
+      spin: (Math.random() - 0.5) * 0.04,
       color: colors[Math.floor(Math.random() * colors.length)],
-      isChar: isChar,
+      isChar: true, // Only render text symbols
       text: symbols[Math.floor(Math.random() * symbols.length)]
     });
     
-    // Cap maximum particles for performance
-    if (particles.length > 200) {
+    // Tight limit to keep the canvas clean and minimal
+    if (particles.length > 40) {
       particles.shift();
     }
   }
