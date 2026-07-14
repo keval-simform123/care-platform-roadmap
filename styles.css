@@ -493,9 +493,23 @@ a:focus-visible {
   position: relative;
   /* Use custom CSS translate variables to avoid GSAP overwrite collisions on junctions */
   transform: translate(var(--translate-x, 0), var(--translate-y, 0));
-  transition: border-color 0.35s var(--transition-bezier), background 0.4s var(--transition-bezier), border-radius 0.4s var(--transition-bezier);
+  transition: transform 0.28s var(--transition-bezier), border-color 0.28s var(--transition-bezier), background 0.28s var(--transition-bezier), border-radius 0.28s var(--transition-bezier), box-shadow 0.28s var(--transition-bezier);
   box-shadow: 0 4px 10px rgba(18, 24, 27, 0.08);
   will-change: transform, box-shadow, border-radius;
+}
+
+/* Professional Zoom / Focus Hover Effect for Active/Completed Nodes */
+.map-node.available:hover,
+.map-node.completed:hover {
+  transform: translate(var(--translate-x, 0), var(--translate-y, 0)) scale(1.14);
+  box-shadow: 0 10px 22px rgba(18, 24, 27, 0.16);
+  z-index: 15; /* Sits above standard connectors */
+}
+
+/* Maintain diamond rotation during hover zoom for Junctions */
+.map-node.node-junction.available:hover,
+.map-node.node-junction.completed:hover {
+  transform: translate(var(--translate-x, 0), var(--translate-y, 0)) rotate(45deg) scale(1.14);
 }
 
 .node-inner {
@@ -1415,15 +1429,4 @@ a:focus-visible {
 .console-line.error {
   color: #F56565;
   font-weight: 700;
-}
-
-/* -------------------------------------------------------------
- * Floating Particle Canvas
- * ------------------------------------------------------------- */
-.particle-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 10; /* Renders in front of grid nodes so trails are clearly visible */
 }
