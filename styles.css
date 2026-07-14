@@ -1416,3 +1416,16 @@ a:focus-visible {
   color: #F56565;
   font-weight: 700;
 }
+
+/* -------------------------------------------------------------
+ * Floating Particle Canvas
+ * ------------------------------------------------------------- */
+.particle-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Sits right above topographic backdrop but behind the track grid */
+}

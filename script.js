@@ -317,6 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initLenis();
   initCustomCursor();
   initBackgroundParallax();
+  initBackgroundParticles();
   initOnboarding();
   
   // Interactive Coordinate Inspector Tracker
@@ -1261,4 +1262,113 @@ function getWobblyPath(x1, y1, x2, y2) {
   }
   d += ` L ${x2} ${y2}`;
   return d;
+}
+
+// Interactive background canvas particle trailing engine
+function initBackgroundParticles() {
+  if (prefersReducedMotion) return;
+  
+  const canvas = document.getElementById('particle-canvas');
+  const scrollArea = document.getElementById('map-scroll-area');
+  if (!canvas || !scrollArea) return;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Resize canvas to cover full scrollable area
+  function resizeCanvas() {
+    canvas.width = scrollArea.scrollWidth;
+    canvas.height = scrollArea.scrollHeight;
+  }
+  
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+  
+  // Listen for mutations/resizes to the scroll container to resize canvas
+  const resizeObserver = new ResizeObserver(() => {
+    resizeCanvas();
+  });
+  resizeObserver.observe(scrollArea);
+  
+  let particles = [];
+  const symbols = ['{', '}', '[', ']', '<', '>', '0', '1', '+', '-', 'x', 'y', 'db', 'api', 'ws', 'git', 'kt', 'xml'];
+  const colors = ['#2B6E5C', '#8B5A6B', '#D4A85A', '#C7C2B8'];
+  
+  // Track last spawn position to limit rate
+  let lastX = 0;
+  let lastY = 0;
+  
+  scrollArea.addEventListener('mousemove', (e) => {
+    const rect = scrollArea.getBoundingClientRect();
+    const x = e.clientX - rect.left + scrollArea.scrollLeft;
+    const y = e.clientY - rect.top + scrollArea.scrollTop;
+    
+    // Check distance moved to prevent spawning too many particles
+    const dist = Math.hypot(x - lastX, y - lastY);
+    if (dist > 12) {
+      spawnParticle(x, y);
+      lastX = x;
+      lastY = y;
+    }
+  });
+  
+  function spawnParticle(x, y) {
+    const isChar = Math.random() > 0.4;
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() - 0.5) * 1.5 - 0.4, // slight upward float
+      alpha: 0.8,
+      decay: Math.random() * 0.012 + 0.008,
+      scale: Math.random() * 0.6 + 0.5,
+      angle: Math.random() * Math.PI * 2,
+      spin: (Math.random() - 0.5) * 0.03,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      isChar: isChar,
+      text: symbols[Math.floor(Math.random() * symbols.length)]
+    });
+    
+    // Cap maximum particles for performance
+    if (particles.length > 150) {
+      particles.shift();
+    }
+  }
+  
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.angle += p.spin;
+      p.alpha -= p.decay;
+      
+      if (p.alpha <= 0) {
+        particles.splice(i, 1);
+        continue;
+      }
+      
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
+      ctx.fillStyle = p.color;
+      
+      if (p.isChar) {
+        ctx.font = `bold ${Math.round(11 * p.scale)}px "Space Mono", monospace`;
+        ctx.fillText(p.text, 0, 0);
+      } else {
+        // Draw a small custom pixelated square or circle
+        const size = 5 * p.scale;
+        ctx.fillRect(-size/2, -size/2, size, size);
+      }
+      
+      ctx.restore();
+    }
+    
+    requestAnimationFrame(animateParticles);
+  }
+  
+  requestAnimationFrame(animateParticles);
 }
