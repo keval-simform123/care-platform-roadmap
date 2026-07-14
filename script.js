@@ -1274,10 +1274,12 @@ function initBackgroundParticles() {
   
   const ctx = canvas.getContext('2d');
   
-  // Resize canvas to cover full scrollable area
+  // Resize canvas to cover full scrollable area and match style dimensions exactly
   function resizeCanvas() {
     canvas.width = scrollArea.scrollWidth;
     canvas.height = scrollArea.scrollHeight;
+    canvas.style.width = scrollArea.scrollWidth + 'px';
+    canvas.style.height = scrollArea.scrollHeight + 'px';
   }
   
   resizeCanvas();
@@ -1304,32 +1306,41 @@ function initBackgroundParticles() {
     
     // Check distance moved to prevent spawning too many particles
     const dist = Math.hypot(x - lastX, y - lastY);
-    if (dist > 12) {
+    if (dist > 8) {
       spawnParticle(x, y);
       lastX = x;
       lastY = y;
     }
   });
   
+  scrollArea.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 0) {
+      const rect = scrollArea.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left + scrollArea.scrollLeft;
+      const y = e.touches[0].clientY - rect.top + scrollArea.scrollTop;
+      spawnParticle(x, y);
+    }
+  }, { passive: true });
+  
   function spawnParticle(x, y) {
-    const isChar = Math.random() > 0.4;
+    const isChar = Math.random() > 0.45;
     particles.push({
       x: x,
       y: y,
-      vx: (Math.random() - 0.5) * 1.5,
-      vy: (Math.random() - 0.5) * 1.5 - 0.4, // slight upward float
-      alpha: 0.8,
-      decay: Math.random() * 0.012 + 0.008,
-      scale: Math.random() * 0.6 + 0.5,
+      vx: (Math.random() - 0.5) * 2.0,
+      vy: (Math.random() - 0.5) * 2.0 - 0.5, // upward float drift
+      alpha: 0.9,
+      decay: Math.random() * 0.01 + 0.006,
+      scale: Math.random() * 0.7 + 0.6,
       angle: Math.random() * Math.PI * 2,
-      spin: (Math.random() - 0.5) * 0.03,
+      spin: (Math.random() - 0.5) * 0.05,
       color: colors[Math.floor(Math.random() * colors.length)],
       isChar: isChar,
       text: symbols[Math.floor(Math.random() * symbols.length)]
     });
     
     // Cap maximum particles for performance
-    if (particles.length > 150) {
+    if (particles.length > 200) {
       particles.shift();
     }
   }
@@ -1356,11 +1367,11 @@ function initBackgroundParticles() {
       ctx.fillStyle = p.color;
       
       if (p.isChar) {
-        ctx.font = `bold ${Math.round(11 * p.scale)}px "Space Mono", monospace`;
+        ctx.font = `bold ${Math.round(15 * p.scale)}px "Space Mono", monospace`;
         ctx.fillText(p.text, 0, 0);
       } else {
         // Draw a small custom pixelated square or circle
-        const size = 5 * p.scale;
+        const size = 8 * p.scale;
         ctx.fillRect(-size/2, -size/2, size, size);
       }
       
